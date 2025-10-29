@@ -1,0 +1,9 @@
+frontend/*env
+frontend/node_modules/
+frontend/.DS_Store
+frontend/.vscode/
+
+backend/*env
+backend/node_modules/
+backend/.DS_Store
+backend/.vscode/
