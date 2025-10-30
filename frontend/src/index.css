@@ -1,1 +1,11 @@
 @import 'tailwindcss';
+
+.kadwa-regular {
+  font-family: "Kadwa", serif;
+  font-weight: 400;
+}
+
+.kadwa-bold {
+  font-family: "Kadwa", serif;
+  font-weight: 700;
+}

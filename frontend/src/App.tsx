@@ -1,10 +1,19 @@
 import './App.css'
+import { Routes, Route } from 'react-router-dom'
+import Home from './pages/Home'
+import NotFound from './pages/NotFound'
+import Background from './components/Background'
 
 const App = () => {
   return (
-    <div className='flex justify-center items-center'>
-      <h1 className='text-2xl text-red-600'>Hello world!</h1>
-    </div>
+    <>
+      <Background />
+      <Routes>
+        <Route path='/' element={<Home />} />
+        <Route path='/home' element={<Home />} />
+        <Route path='*' element={<NotFound />} />
+      </Routes>
+    </>
   )
 }
 
