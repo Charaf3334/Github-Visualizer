@@ -4,8 +4,8 @@ import axios from 'axios'
 import Navbar from '../components/Navbar'
 import Spinner from '../components/Spinner'
 import NotFound from './NotFound'
-import 
-{
+import UserList from '../components/UserList'
+import {
   BarChart,
   Bar,
   XAxis,
@@ -46,8 +46,6 @@ interface LangData
   percentage: number
 }
 
-const COLORS = ['#e91e63', '#9c27b0', '#ff9800', '#4caf50', '#f44336', '#2196f3', '#ffc107', '#00bcd4']
-
 const UserData = () => {
   const { login } = useParams<{ login: string }>()
   const location = useLocation()
@@ -57,24 +55,31 @@ const UserData = () => {
   const [notFound, setNotFound] = useState(false)
   const [languages, setLanguages] = useState<LangData[]>([])
   const [topRepos, setTopRepos] = useState<Repo[]>([])
+  const [showList, setShowList] = useState<null | 'followers' | 'following'>(null)
+  const [listUsers, setListUsers] = useState<User[]>([])
+  const COLORS = ['#e91e63', '#9c27b0', '#ff9800', '#4caf50', '#f44336', '#2196f3', '#ffc107', '#00bcd4']
 
+  
   useEffect(() => {
     if (!login) 
-        return
+      return
+    const token = import.meta.env.VITE_GITHUB_TOKEN
+    const headers = {Authorization: `token ${token}`}
     const fetchData = async () => {
       try 
       {
         const { data: u } = await axios.get<User>(`${import.meta.env.VITE_BACK_URL}/users`, { params: { username: login } })
         setUser(u)
         setNotFound(false)
-        if (u.languages) {
+        if (u.languages) 
+        {
           const total = Object.values(u.languages).reduce((a, b) => a + b, 0)
           const langs: LangData[] = Object.entries(u.languages)
             .map(([name, val]) => ({ name, value: val, percentage: (val / total) * 100 }))
             .sort((a, b) => b.value - a.value)
           setLanguages(langs)
         }
-        const { data: repos } = await axios.get<Repo[]>(`https://api.github.com/users/${login}/repos?sort=stars&per_page=5`)
+        const { data: repos } = await axios.get<Repo[]>(`https://api.github.com/users/${login}/repos?sort=stars&per_page=5`, {headers})
         setTopRepos(repos)
       } 
       catch 
@@ -89,28 +94,44 @@ const UserData = () => {
     fetchData()
   }, [login])
 
+  const handleListOpen = async (type: 'followers' | 'following') => {
+    if (!login) 
+      return
+    try 
+    {
+      const token = import.meta.env.VITE_GITHUB_TOKEN
+      const headers = {Authorization: `token ${token}`}
+      const { data } = await axios.get(`https://api.github.com/users/${login}/${type}`, {headers})
+      setListUsers(data)
+      setShowList(type)
+    } 
+    catch
+    {
+      setListUsers([])
+      setShowList(type)
+    }
+  }
   if (loading) 
   {
     return (
-        <div className="min-h-screen text-white kadwa-regular">
+      <div className="min-h-screen text-white kadwa-regular">
         <Navbar />
         <div className="flex justify-center mt-20">
-            <Spinner />
+          <Spinner />
         </div>
-        </div>
+      </div>
     )
   }
   if (notFound) 
   {
-      return (
-        <div>
-            <NotFound />
-        </div>
-      )
+    return (
+      <div>
+        <NotFound />
+      </div>
+    )
   }
   if (!user) 
     return null
-
   const maxBars = 8
   const displayedLangs = languages.length > maxBars ? languages.slice(0, maxBars) : languages
   const showSmallBars = languages.length < 3 ? true : false
@@ -121,12 +142,32 @@ const UserData = () => {
       <div className="max-w-6xl mx-auto px-4 py-10 mt-6">
         <div className="bg-linear-to-br from-gray-500/10 to-purple-500/2 backdrop-blur-sm border border-white/10 p-8 rounded-2xl shadow-2xl mb-8 flex flex-col md:flex-row items-center gap-6">
           <img src={user.avatar_url} alt={user.login} className="w-32 h-32 rounded-full border-4 border-white/20 shadow-lg" />
-          <div className="flex-1 text-center md:text-left">
+          <div className="flex-1 text-center md:text-left relative w-full">
+            <div className="md:absolute md:top-0 md:right-0 mt-4 md:mt-0">
+              <a
+                href={`https://github.com/${user.login}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mb-4 inline-block border hover:bg-white/10 transition-colors text-white font-semibold px-4 py-2 rounded-lg text-xs"
+              >
+                Visit Account
+              </a>
+            </div>
             <h1 className="text-2xl md:text-3xl font-bold mb-2">{user.login}</h1>
             {user.bio && <p className="text-gray-300 text-md mb-4">{user.bio}</p>}
             <div className="flex flex-wrap gap-6 justify-center md:justify-start text-gray-300">
-              <div><span className="text-1xl font-bold text-white">{user.followers}</span> Followers</div>
-              <div><span className="text-1xl font-bold text-white">{user.following}</span> Following</div>
+              <div
+                onClick={() => handleListOpen('followers')}
+                className="cursor-pointer hover:text-white transition"
+              >
+                <span className="text-1xl font-bold text-white">{user.followers}</span> Followers
+              </div>
+              <div
+                onClick={() => handleListOpen('following')}
+                className="cursor-pointer hover:text-white transition"
+              >
+                <span className="text-1xl font-bold text-white">{user.following}</span> Following
+              </div>
               <div><span className="text-1xl font-bold text-white">{user.public_repos}</span> Repositories</div>
             </div>
           </div>
@@ -166,15 +207,24 @@ const UserData = () => {
             {topRepos.length ? (
               <div className="space-y-4 max-h-96 overflow-y-auto pr-2">
                 {topRepos.map(repo => (
-                  <a key={repo.name} href={repo.html_url} target="_blank" rel="noopener noreferrer"
-                     className="block bg-white/5 p-4 rounded-xl border border-white/10">
+                  <a
+                    key={repo.name}
+                    href={repo.html_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block bg-white/5 p-4 rounded-xl border border-white/10 hover:bg-white/6"
+                  >
                     <h3 className="text-lg font-semibold text-blue-400 mb-2">{repo.name}</h3>
                     {repo.description && <p className="text-gray-300 text-sm mb-3 line-clamp-2">{repo.description}</p>}
                     <div className="flex flex-wrap gap-4 text-sm text-gray-400">
                       <div className="flex items-center gap-1"><Star size={16} className="text-yellow-400" /> {repo.stargazers_count}</div>
                       <div className="flex items-center gap-1"><GitFork size={16} className="text-blue-400" /> {repo.forks_count}</div>
                       <div className="flex items-center gap-1"><Eye size={16} className="text-green-400" /> {repo.watchers_count}</div>
-                      {repo.language && <div className="flex items-center gap-1"><span className="w-3 h-3 rounded-full" style={{background: `linear-gradient(90deg, #9c27b0, #ff9800)`}}></span> {repo.language}</div>}
+                      {repo.language && (
+                        <div className="flex items-center gap-1">
+                          <span className="w-3 h-3 rounded-full" style={{ background: `linear-gradient(90deg, #9c27b0, #ff9800)` }}></span> {repo.language}
+                        </div>
+                      )}
                     </div>
                   </a>
                 ))}
@@ -183,6 +233,22 @@ const UserData = () => {
           </div>
         </div>
       </div>
+      {showList && (
+        <UserList
+          title={showList === 'followers' ? 'Followers' : 'Following'}
+          users={listUsers.map(u => ({
+            login: u.login,
+            avatar_url: u.avatar_url,
+            html_url: `https://github.com/${u.login}`
+          }))}
+          onClose={() => setShowList(null)}
+          onSelect={(login) => {
+            setShowList(null)
+            window.scrollTo(0, 0)
+            window.location.href = `/user/${login}`
+          }}
+        />
+      )}
     </div>
   )
 }

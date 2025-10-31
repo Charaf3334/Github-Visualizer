@@ -29,7 +29,6 @@ const Home = () => {
     try 
     {
       await new Promise(res => setTimeout(res, 1000))
-
       const {data} = await axios.get(`${import.meta.env.VITE_BACK_URL}/users`, {
         params: {username}
       })
