@@ -12,11 +12,11 @@ interface Repo
 {
   name: string
   description: string
-  stargazers_count: number
+  stars_count: number
   forks_count: number
   watchers_count: number
   language: string
-  html_url: string
+  url: string
 }
 
 interface User 
@@ -156,14 +156,12 @@ const UserData = () => {
             <div className="flex flex-wrap gap-6 justify-center md:justify-start text-gray-300">
               <div
                 onClick={() => handleListOpen('followers')}
-                className="cursor-pointer hover:text-white transition"
-              >
+                className="cursor-pointer hover:text-white transition">
                 <span className="text-1xl font-bold text-white">{user.followers}</span> Followers
               </div>
               <div
                 onClick={() => handleListOpen('following')}
-                className="cursor-pointer hover:text-white transition"
-              >
+                className="cursor-pointer hover:text-white transition">
                 <span className="text-1xl font-bold text-white">{user.following}</span> Following
               </div>
               <div><span className="text-1xl font-bold text-white">{user.public_repos}</span> Repositories</div>
@@ -180,8 +178,7 @@ const UserData = () => {
                   <BarChart
                     data={displayedLangs}
                     layout="vertical"
-                    margin={{top: 5, right: 30, left: 10, bottom: 5}}
-                  >
+                    margin={{top: 5, right: 30, left: 10, bottom: 5}}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#333" opacity={0.6} />
                     <XAxis type="number" hide={showSmallBars} />
                     <YAxis dataKey="name" type="category" width={100} tick={{fill: '#aaa', fontSize: 14}} />
@@ -191,32 +188,32 @@ const UserData = () => {
                       formatter={(value: number) => {
                         const lang = displayedLangs.find(l => l.value === value)
                         return [`${lang?.percentage.toFixed(1)}%`, 'Percentage']
-                    }}
-                    />
+                    }}/>
                     <Bar dataKey="value" radius={[4, 4, 4, 4]} isAnimationActive={false} cursor="default">
                       {displayedLangs.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                     </Bar>
                   </BarChart>
                 </ResponsiveContainer>
               </div>
-            ) : <p className="text-gray-400 text-center py-12">No language data available</p>}
+           ) 
+           : <p className="text-gray-400 text-center py-12">No language data available</p>}
           </div>
           <div className="bg-white/5 backdrop-blur-sm border border-white/10 p-6 rounded-2xl shadow-xl">
             <h2 className="text-2xl font-bold mb-6">Top Repositories</h2>
-            {topRepos.length ? (
+            {topRepos.length 
+            ? (
               <div className="space-y-4 max-h-96 overflow-y-auto pr-2">
                 {topRepos.map(repo => (
                   <a
                     key={repo.name}
-                    href={repo.html_url}
+                    href={repo.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="block bg-white/5 p-4 rounded-xl border border-white/10 hover:bg-white/6"
-                  >
+                    className="block bg-white/5 p-4 rounded-xl border border-white/10 hover:bg-white/6">
                     <h3 className="text-lg font-semibold text-blue-400 mb-2">{repo.name}</h3>
                     {repo.description && <p className="text-gray-300 text-sm mb-3 line-clamp-2">{repo.description}</p>}
                     <div className="flex flex-wrap gap-4 text-sm text-gray-400">
-                      <div className="flex items-center gap-1"><Star size={16} className="text-yellow-400" /> {repo.stargazers_count}</div>
+                      <div className="flex items-center gap-1"><Star size={16} className="text-yellow-400" /> {repo.stars_count}</div>
                       <div className="flex items-center gap-1"><GitFork size={16} className="text-blue-400" /> {repo.forks_count}</div>
                       <div className="flex items-center gap-1"><Eye size={16} className="text-green-400" /> {repo.watchers_count}</div>
                       {repo.language && (
@@ -228,7 +225,8 @@ const UserData = () => {
                   </a>
                 ))}
               </div>
-            ) : <p className="text-gray-400 text-center py-12">No repositories found</p>}
+            ) 
+            : <p className="text-gray-400 text-center py-12">No repositories found</p>}
           </div>
         </div>
       </div>
@@ -238,7 +236,7 @@ const UserData = () => {
           users={listUsers.map(u => ({
             login: u.login,
             avatar_url: u.avatar_url,
-            html_url: `https://github.com/${u.login}`
+            url: `https://github.com/${u.login}`
         }))}
           onClose={() => setShowList(null)}
           onSelect={(login) => {
@@ -246,8 +244,7 @@ const UserData = () => {
             window.scrollTo(0, 0)
             window.location.href = `/user/${login}`
         }}
-          loading={loadingList}
-        />
+          loading={loadingList}/>
       )}
     </div>
   )

@@ -13,13 +13,12 @@ const NotFound = () => {
         <p className="text-white text-xl">Are you lost? This page got deleted or it does not exist.</p>
         <button
           onClick={() => navigate('/')}
-          className="px-6 py-3 bg-transparent text-white border border-white/30 rounded-xl transition-all duration-300 cursor-pointer hover:bg-white/15"
-        >
+          className="px-6 py-3 bg-transparent text-white border border-white/30 rounded-xl transition-all duration-300 cursor-pointer hover:bg-white/15">
           Take Me Home
         </button>
       </div>
     </div>
-  );
+  )
 }
 
-export default NotFound;
+export default NotFound

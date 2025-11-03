@@ -9,7 +9,7 @@ const app = express()
 app.use(cors({origin: process.env.FRONT_URL}))
 app.use(express.json())
 
-const port = process.env.PORT || 3000
+const port = process.env.PORT
 
 const tokens = [process.env.GITHUB_TOKEN1, process.env.GITHUB_TOKEN2]
 let currentTokenIndex = 0
@@ -39,13 +39,16 @@ const getAllRepos = async (username) => {
   let page = 1
   const repos = []
 
-  while (true) {
+  while (true) 
+  {
     const {data} = await axios.get(`https://api.github.com/users/${username}/repos?per_page=100&page=${page}`, {headers: getHeaders()})
-    if (!data.length) break
+    if (!data.length) 
+      break
     repos.push(...data)
-    if (data.length < 100) break
+    if (data.length < 100) 
+      break
     page++
-}
+  }
 
   return repos
 }
@@ -92,11 +95,11 @@ app.get('/users', async (req, res) => {
       public_repos: user.public_repos,
       languages: languagePercentages,
   })
-} 
-  catch (err) 
+  } 
+  catch (err)
   {
     res.status(err.response?.status || 500).json({error: 'User not found or API error'})
-}
+  }
 })
 
 app.listen(port, () => console.log(`Server running on port: ${port}`))

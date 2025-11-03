@@ -4,7 +4,7 @@ interface MiniUser
 {
   login: string
   avatar_url: string
-  html_url: string
+  url: string
 }
 
 interface UserListProps 
@@ -20,16 +20,13 @@ const UserList = ({title, users, onClose, onSelect, loading = false}: UserListPr
   return (
     <div
       className="fixed inset-0 bg-black/60 flex items-center justify-center z-50"
-      onClick={onClose}
-    >
+      onClick={onClose}>
       <div
         className="bg-[#111]/95 border border-gray-700 rounded-2xl shadow-2xl w-full max-w-md max-h-[80vh] overflow-y-auto p-6 text-white relative animate-slideUp"
-        onClick={(e) => e.stopPropagation()}
-      >
+        onClick={(e) => e.stopPropagation()}>
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-white transition"
-        >
+          className="absolute top-4 right-4 text-gray-400 hover:text-white transition">
           <X size={20} className='cursor-pointer'/>
         </button>
         <h2 className="text-2xl font-semibold mb-6 text-center tracking-wide">
@@ -48,13 +45,11 @@ const UserList = ({title, users, onClose, onSelect, loading = false}: UserListPr
               <button
                 key={u.login}
                 onClick={() => onSelect(u.login)}
-                className="flex cursor-pointer items-center gap-4 w-full p-3 rounded-xl transition bg-[#1a1a1a] hover:bg-[#242424] border border-transparent hover:border-gray-700 text-left"
-              >
+                className="flex cursor-pointer items-center gap-4 w-full p-3 rounded-xl transition bg-[#1a1a1a] hover:bg-[#242424] border border-transparent hover:border-gray-700 text-left">
                 <img
                   src={u.avatar_url}
                   alt={u.login}
-                  className="w-10 h-10 rounded-full border border-gray-700"
-                />
+                  className="w-10 h-10 rounded-full border border-gray-700"/>
                 <div>
                   <span className="font-semibold text-white">{u.login}</span>
                   <p className="text-xs text-gray-400">@{u.login}</p>
