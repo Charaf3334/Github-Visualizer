@@ -18,7 +18,8 @@ const getCurrentToken = () => tokens[currentTokenIndex]
 const getHeaders = () => ({Authorization: `token ${getCurrentToken()}`})
 
 const checkRate = async () => {
-  try {
+  try 
+  {
     const res = await axios.get('https://api.github.com/rate_limit', {headers: getHeaders()})
     const {remaining, limit, reset} = res.data.rate
     console.log(`Token ${currentTokenIndex + 1}: ${remaining}/${limit} remaining, resets at ${new Date(reset * 1000)}`)
@@ -27,12 +28,12 @@ const checkRate = async () => {
     {
       currentTokenIndex = (currentTokenIndex + 1) % tokens.length
       console.log(`Switching to token ${currentTokenIndex + 1}`)
-  }
-} 
+    }
+  } 
   catch (err) 
   {
     console.error('Error checking rate:', err.message)
-}
+  }
 }
 
 const getAllRepos = async (username) => {
@@ -99,6 +100,45 @@ app.get('/users', async (req, res) => {
   catch (err)
   {
     res.status(err.response?.status || 500).json({error: 'User not found or API error'})
+  }
+})
+
+app.get('/users/:username/repos', async (req, res) => {
+  
+  const {username} = req.params
+  if (!username) 
+    return res.status(400).json({error: 'Username is required'})
+
+  try 
+  {
+    await checkRate()
+    const {data: repos} = await axios.get(`https://api.github.com/users/${username}/repos?sort=stars&per_page=5`, {headers: getHeaders()})
+    res.status(200).json(repos)
+  } 
+  catch (err) 
+  {
+    res.status(err.response?.status || 500).json({error: 'Failed to fetch repositories'})
+  }
+})
+
+app.get('/users/:username/:type', async (req, res) => {
+  
+  const {username, type} = req.params
+  if (!username || !type) 
+    return res.status(400).json({error: 'Username and type are required'})
+  
+  if (type !== 'followers' && type !== 'following') 
+    return res.status(400).json({error: 'Type must be followers or following'})
+
+  try 
+  {
+    await checkRate()
+    const {data} = await axios.get(`https://api.github.com/users/${username}/${type}`, {headers: getHeaders()})
+    res.status(200).json(data)
+  } 
+  catch (err) 
+  {
+    res.status(err.response?.status || 500).json({error: `Failed to fetch ${type}`})
   }
 })
 

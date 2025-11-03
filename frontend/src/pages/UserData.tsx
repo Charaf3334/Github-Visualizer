@@ -12,7 +12,7 @@ interface Repo
 {
   name: string
   description: string
-  stars_count: number
+  stargazers_count: number
   forks_count: number
   watchers_count: number
   language: string
@@ -54,8 +54,6 @@ const UserData = () => {
   useEffect(() => {
     if (!login) 
       return
-    const token = import.meta.env.VITE_GITHUB_TOKEN
-    const headers = {Authorization: `token ${token}`}
     const fetchData = async () => {
       try 
       {
@@ -69,20 +67,20 @@ const UserData = () => {
             .map(([name, val]) => ({name, value: val, percentage: (val / total) * 100}))
             .sort((a, b) => b.value - a.value)
           setLanguages(langs)
-      }
-        const {data: repos} = await axios.get<Repo[]>(`https://api.github.com/users/${login}/repos?sort=stars&per_page=5`, {headers})
+        }
+        const {data: repos} = await axios.get<Repo[]>(`${import.meta.env.VITE_BACK_URL}/users/${login}/repos`)
         setTopRepos(repos)
-    } 
+      } 
       catch 
       {
         setNotFound(true)
-    } 
+      } 
       finally 
       {
         setLoading(false)
-    }
+      }
   }
-    fetchData()
+  fetchData()
 }, [login])
 
   const handleListOpen = async (type: 'followers' | 'following') => {
@@ -95,19 +93,16 @@ const UserData = () => {
     
     try 
     {
-      const token = import.meta.env.VITE_GITHUB_TOKEN
-      const headers = {Authorization: `token ${token}`}
-
-      const {data} = await axios.get(`https://api.github.com/users/${login}/${type}`, {headers})
+      const {data} = await axios.get(`${import.meta.env.VITE_BACK_URL}/users/${login}/${type}`)
       setListUsers(data)
-  } 
+    } 
     catch 
     {
       setListUsers([])
-  }
+    }
     finally {
       setLoadingList(false)
-  }
+    }
 }
   
   if (loading) 
@@ -147,9 +142,7 @@ const UserData = () => {
                 href={`https://github.com/${user.login}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mb-4 inline-block border hover:bg-white/10 transition-colors text-white font-semibold px-4 py-2 rounded-lg text-xs"
-              >Visit Account
-              </a>
+                className="mb-4 inline-block border hover:bg-white/10 transition-colors text-white font-semibold px-4 py-2 rounded-lg text-xs">Visit Account</a>
             </div>
             <h1 className="text-2xl md:text-3xl font-bold mb-2">{user.login}</h1>
             {user.bio && <p className="text-gray-300 text-md mb-4">{user.bio}</p>}
@@ -213,7 +206,7 @@ const UserData = () => {
                     <h3 className="text-lg font-semibold text-blue-400 mb-2">{repo.name}</h3>
                     {repo.description && <p className="text-gray-300 text-sm mb-3 line-clamp-2">{repo.description}</p>}
                     <div className="flex flex-wrap gap-4 text-sm text-gray-400">
-                      <div className="flex items-center gap-1"><Star size={16} className="text-yellow-400" /> {repo.stars_count}</div>
+                      <div className="flex items-center gap-1"><Star size={16} className="text-yellow-400" /> {repo.stargazers_count}</div>
                       <div className="flex items-center gap-1"><GitFork size={16} className="text-blue-400" /> {repo.forks_count}</div>
                       <div className="flex items-center gap-1"><Eye size={16} className="text-green-400" /> {repo.watchers_count}</div>
                       {repo.language && (
