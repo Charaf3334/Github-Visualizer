@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react'
 
-interface Star {
+interface Star 
+{
   x: number
   y: number
   radius: number
@@ -23,15 +24,15 @@ const Background: React.FC = () => {
       return
     let animationFrameId: number
     const generateStars = (width: number, height: number) => {
-      return Array.from({ length: 200 }, () => ({
+      return Array.from({length: 200}, () => ({
         x: Math.random() * width,
         y: Math.random() * height,
         radius: Math.random() * 1.5 + 0.5,
         vx: (Math.random() - 0.5) * 0.5,
         vy: (Math.random() - 0.5) * 0.5,
         opacity: Math.random() * 0.2 + 0.2,
-      }))
-    }
+    }))
+  }
     const resizeCanvas = (): void => {
       const prevWidth = canvas.width
       const prevHeight = canvas.height
@@ -40,10 +41,10 @@ const Background: React.FC = () => {
       starsRef.current.forEach((star) => {
         star.x = (star.x / prevWidth) * newWidth
         star.y = (star.y / prevHeight) * newHeight
-      })
+    })
       canvas.width = newWidth
       canvas.height = newHeight
-    }
+  }
     canvas.width = window.innerWidth
     canvas.height = window.innerHeight
     starsRef.current = generateStars(canvas.width, canvas.height)
@@ -68,15 +69,15 @@ const Background: React.FC = () => {
         ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2)
         ctx.fillStyle = `rgba(255, 255, 255, ${star.opacity})`
         ctx.fill()
-      })
+    })
       animationFrameId = requestAnimationFrame(animate)
-    }
+  }
     animate()
     return () => {
       window.removeEventListener('resize', resizeCanvas)
       cancelAnimationFrame(animationFrameId)
-    }
-  }, [])
+  }
+}, [])
 
   return (
     <div className="fixed inset-0 w-full h-full -z-10">

@@ -2,20 +2,11 @@ import { useParams, useLocation } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import axios from 'axios'
 import Navbar from '../components/Navbar'
-import Spinner from '../components/Spinner'
+import { Loader2 } from 'lucide-react'
 import NotFound from './NotFound'
 import UserList from '../components/UserList'
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  Cell,
-  CartesianGrid
-} from 'recharts'
-import { Star, GitFork, Eye } from 'lucide-react'
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, CartesianGrid } from 'recharts'
+import {Star, GitFork, Eye} from 'lucide-react'
 
 interface Repo 
 {
@@ -47,9 +38,9 @@ interface LangData
 }
 
 const UserData = () => {
-  const { login } = useParams<{ login: string }>()
+  const {login} = useParams<{login: string}>()
   const location = useLocation()
-  const stateData = location.state as { userData?: User } | null
+  const stateData = location.state as {userData?: User} | null
   const [user, setUser] = useState<User | null>(stateData?.userData || null)
   const [loading, setLoading] = useState(!stateData?.userData)
   const [notFound, setNotFound] = useState(false)
@@ -57,8 +48,8 @@ const UserData = () => {
   const [topRepos, setTopRepos] = useState<Repo[]>([])
   const [showList, setShowList] = useState<null | 'followers' | 'following'>(null)
   const [listUsers, setListUsers] = useState<User[]>([])
+  const [loadingList, setLoadingList] = useState(false)
   const COLORS = ['#e91e63', '#9c27b0', '#ff9800', '#4caf50', '#f44336', '#2196f3', '#ffc107', '#00bcd4']
-
   
   useEffect(() => {
     if (!login) 
@@ -68,60 +59,68 @@ const UserData = () => {
     const fetchData = async () => {
       try 
       {
-        const { data: u } = await axios.get<User>(`${import.meta.env.VITE_BACK_URL}/users`, { params: { username: login } })
+        const {data: u} = await axios.get<User>(`${import.meta.env.VITE_BACK_URL}/users`, {params: {username: login}})
         setUser(u)
         setNotFound(false)
         if (u.languages) 
         {
           const total = Object.values(u.languages).reduce((a, b) => a + b, 0)
           const langs: LangData[] = Object.entries(u.languages)
-            .map(([name, val]) => ({ name, value: val, percentage: (val / total) * 100 }))
+            .map(([name, val]) => ({name, value: val, percentage: (val / total) * 100}))
             .sort((a, b) => b.value - a.value)
           setLanguages(langs)
-        }
-        const { data: repos } = await axios.get<Repo[]>(`https://api.github.com/users/${login}/repos?sort=stars&per_page=5`, {headers})
+      }
+        const {data: repos} = await axios.get<Repo[]>(`https://api.github.com/users/${login}/repos?sort=stars&per_page=5`, {headers})
         setTopRepos(repos)
-      } 
+    } 
       catch 
       {
         setNotFound(true)
-      } 
+    } 
       finally 
       {
         setLoading(false)
-      }
     }
+  }
     fetchData()
-  }, [login])
+}, [login])
 
   const handleListOpen = async (type: 'followers' | 'following') => {
     if (!login) 
       return
+    if (showList === type && listUsers.length > 0) 
+      return
+    setShowList(type)
+    setLoadingList(true)
+    
     try 
     {
       const token = import.meta.env.VITE_GITHUB_TOKEN
       const headers = {Authorization: `token ${token}`}
-      const { data } = await axios.get(`https://api.github.com/users/${login}/${type}`, {headers})
+
+      const {data} = await axios.get(`https://api.github.com/users/${login}/${type}`, {headers})
       setListUsers(data)
-      setShowList(type)
-    } 
-    catch
+  } 
+    catch 
     {
       setListUsers([])
-      setShowList(type)
-    }
   }
+    finally {
+      setLoadingList(false)
+  }
+}
+  
   if (loading) 
   {
     return (
       <div className="min-h-screen text-white kadwa-regular">
         <Navbar />
         <div className="flex justify-center mt-20">
-          <Spinner />
+          <Loader2 size={40} className="animate-spin text-white/10 mb-4" />
         </div>
       </div>
     )
-  }
+}
   if (notFound) 
   {
     return (
@@ -129,7 +128,7 @@ const UserData = () => {
         <NotFound />
       </div>
     )
-  }
+}
   if (!user) 
     return null
   const maxBars = 8
@@ -149,8 +148,7 @@ const UserData = () => {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="mb-4 inline-block border hover:bg-white/10 transition-colors text-white font-semibold px-4 py-2 rounded-lg text-xs"
-              >
-                Visit Account
+              >Visit Account
               </a>
             </div>
             <h1 className="text-2xl md:text-3xl font-bold mb-2">{user.login}</h1>
@@ -175,24 +173,25 @@ const UserData = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div className="bg-white/5 backdrop-blur-sm border border-white/10 p-6 rounded-2xl shadow-xl">
             <h2 className="text-2xl font-bold mb-6">Languages</h2>
-            {displayedLangs.length ? (
+            {displayedLangs.length 
+            ? (
               <div className="h-96">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart
                     data={displayedLangs}
                     layout="vertical"
-                    margin={{ top: 5, right: 30, left: 10, bottom: 5 }}
+                    margin={{top: 5, right: 30, left: 10, bottom: 5}}
                   >
                     <CartesianGrid strokeDasharray="3 3" stroke="#333" opacity={0.6} />
                     <XAxis type="number" hide={showSmallBars} />
-                    <YAxis dataKey="name" type="category" width={100} tick={{ fill: '#aaa', fontSize: 14 }} />
+                    <YAxis dataKey="name" type="category" width={100} tick={{fill: '#aaa', fontSize: 14}} />
                     <Tooltip
-                      contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '8px' }}
-                      itemStyle={{ color: '#fff' }}
+                      contentStyle={{backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '8px'}}
+                      itemStyle={{color: '#fff'}}
                       formatter={(value: number) => {
                         const lang = displayedLangs.find(l => l.value === value)
                         return [`${lang?.percentage.toFixed(1)}%`, 'Percentage']
-                      }}
+                    }}
                     />
                     <Bar dataKey="value" radius={[4, 4, 4, 4]} isAnimationActive={false} cursor="default">
                       {displayedLangs.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
@@ -222,7 +221,7 @@ const UserData = () => {
                       <div className="flex items-center gap-1"><Eye size={16} className="text-green-400" /> {repo.watchers_count}</div>
                       {repo.language && (
                         <div className="flex items-center gap-1">
-                          <span className="w-3 h-3 rounded-full" style={{ background: `linear-gradient(90deg, #9c27b0, #ff9800)` }}></span> {repo.language}
+                          <span className="w-3 h-3 rounded-full" style={{background: `linear-gradient(90deg, #9c27b0, #ff9800)`}}></span> {repo.language}
                         </div>
                       )}
                     </div>
@@ -240,13 +239,14 @@ const UserData = () => {
             login: u.login,
             avatar_url: u.avatar_url,
             html_url: `https://github.com/${u.login}`
-          }))}
+        }))}
           onClose={() => setShowList(null)}
           onSelect={(login) => {
             setShowList(null)
             window.scrollTo(0, 0)
             window.location.href = `/user/${login}`
-          }}
+        }}
+          loading={loadingList}
         />
       )}
     </div>
