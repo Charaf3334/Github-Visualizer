@@ -68,6 +68,7 @@ app.get('/users', async (req, res) => {
     const repos = await getAllRepos(username)
     const languages = {}
     const SIZE = 5
+    let allStars = 0
 
     for (let i = 0; i < repos.length; i += SIZE) 
     {
@@ -78,13 +79,19 @@ app.get('/users', async (req, res) => {
           for (const [lang, bytes] of Object.entries(r.value.data))
             languages[lang] = (languages[lang] || 0) + bytes
     })
-  }
+    chunk.forEach(repo => {
+      allStars += repo.stargazers_count || 0;
+    })
+    }
 
     const total = Object.values(languages).reduce((a, b) => a + b, 0)
     const languagePercentages = {}
     for (const [lang, bytes] of Object.entries(languages)) {
       languagePercentages[lang] = Math.round((bytes / total) * 100)
-  }
+    }
+
+    const createdDate = new Date(user.created_at)
+    const activeSince = createdDate.toLocaleDateString('en-US', {year: 'numeric', month: 'long'})
 
     res.status(200).json({
       login: user.login,
@@ -95,7 +102,9 @@ app.get('/users', async (req, res) => {
       following: user.following,
       public_repos: user.public_repos,
       languages: languagePercentages,
-  })
+      all_stars: allStars,
+      active_since: activeSince
+    })
   } 
   catch (err)
   {

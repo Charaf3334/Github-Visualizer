@@ -16,7 +16,7 @@ interface Repo
   forks_count: number
   watchers_count: number
   language: string
-  url: string
+  html_url: string
 }
 
 interface User 
@@ -28,6 +28,8 @@ interface User
   public_repos: number
   bio?: string
   languages?: Record<string, number>
+  all_stars?: number
+  active_since?: string
 }
 
 interface LangData 
@@ -142,9 +144,16 @@ const UserData = () => {
                 href={`https://github.com/${user.login}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mb-4 inline-block border hover:bg-white/10 transition-colors text-white font-semibold px-4 py-2 rounded-lg text-xs">Visit Account</a>
+                className="mb-4 inline-block border hover:bg-white/10 transition-colors text-white font-semibold px-4 py-2 rounded-lg text-xs">Visit Account
+              </a>
             </div>
-            <h1 className="text-2xl md:text-3xl font-bold mb-2">{user.login}</h1>
+            <div className="md:inline-flex inline-block items-center gap-x-3">
+              <h1 className="text-2xl md:text-3xl font-bold mb-2">{user.login}</h1>
+              <span className="inline-flex items-center gap-x-1 px-3 py-1 bg-transparent text-green-700 rounded-full text-sm font-medium border mb-3">
+                <span className="w-2 h-2 bg-green-700 rounded-full"></span>
+                Est. {user.active_since}
+              </span>
+            </div>
             {user.bio && <p className="text-gray-300 text-md mb-4">{user.bio}</p>}
             <div className="flex flex-wrap gap-6 justify-center md:justify-start text-gray-300">
               <div
@@ -192,14 +201,17 @@ const UserData = () => {
            : <p className="text-gray-400 text-center py-12">No language data available</p>}
           </div>
           <div className="bg-white/5 backdrop-blur-sm border border-white/10 p-6 rounded-2xl shadow-xl">
-            <h2 className="text-2xl font-bold mb-6">Top Repositories</h2>
+            <div className='flex justify-between'>
+              <h2 className="text-2xl font-bold mb-6">Top Repositories</h2>
+              <span className='kadwa-bold'>Total stars: <span className='text-yellow-400'>{user.all_stars}</span></span>
+            </div>
             {topRepos.length 
             ? (
               <div className="space-y-4 max-h-96 overflow-y-auto pr-2">
                 {topRepos.map(repo => (
                   <a
                     key={repo.name}
-                    href={repo.url}
+                    href={repo.html_url}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="block bg-white/5 p-4 rounded-xl border border-white/10 hover:bg-white/6">
