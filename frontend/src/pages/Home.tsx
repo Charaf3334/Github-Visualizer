@@ -1,5 +1,5 @@
 import Navbar from '../components/Navbar'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import { Loader2 } from 'lucide-react'
@@ -11,12 +11,18 @@ const Home = () => {
   const [notFound, setNotFound] = useState(false)
   const [loading, setLoading] = useState(false)
   const [wait, setWait] = useState(false)
+  const buttonRef = useRef<HTMLButtonElement>(null)
   const navigate = useNavigate()
   
   const onchangeHandle = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUsername(e.target.value)
     setIsEmpty(false)
     setNotFound(false)
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter')
+      buttonRef.current?.click()
   }
   
   useEffect(() => {
@@ -79,11 +85,14 @@ const Home = () => {
               type="text"
               value={username}
               onChange={onchangeHandle}
+              onKeyDown={handleKeyDown}
+              tabIndex={0}
               placeholder="Enter your Github username"
               className="flex-1 px-5 py-3 text-white text-base md:text-lg placeholder:text-gray-400 outline-none bg-transparent"/>
               <button 
                 className="px-5 py-3 bg-white/30 hover:bg-white/35 transition-colors duration-300 text-white flex items-center justify-center cursor-pointer"
                 onClick={handleSearch}
+                ref={buttonRef}
                 disabled={loading}>
                 {loading 
                 ? (
