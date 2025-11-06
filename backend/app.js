@@ -2,6 +2,7 @@ import express from 'express'
 import axios from 'axios'
 import dotenv from 'dotenv'
 import cors from 'cors'
+import sqlite3 from 'sqlite3'
 
 dotenv.config()
 
@@ -10,6 +11,14 @@ app.use(cors({origin: process.env.FRONT_URL}))
 app.use(express.json())
 
 const port = process.env.PORT
+
+sqlite3.verbose();
+const database = new sqlite3.Database('./history.sqlite', (err) => {
+  if (err)
+    console.log(err.message)
+  else
+    console.log('Database connected')
+})
 
 const tokens = [process.env.GITHUB_TOKEN1, process.env.GITHUB_TOKEN2]
 let currentTokenIndex = 0
@@ -54,8 +63,60 @@ const getAllRepos = async (username) => {
   return repos
 }
 
+const databaseOperations = async (username, user) => {
+  database.get(`SELECT COUNT(*) AS count FROM "users"`, (err, row) => {
+    if (err)
+    {
+      console.log('Error in counting rows')
+      return res.status(500).json({error: 'Database error'})
+    }
+    if (row.count >= 20)
+    {
+      database.run(`DELETE FROM "users" WHERE id IN (
+        SELECT id FROM "users"
+        ORDER BY datetime(created_at) ASC
+        LIMIT 10
+        )`, function (err) {
+          if (err)
+          {
+            console.log('Error in deleting rows')
+            return res.status(500).json({error: 'Database error'})
+          }
+          console.log(`Deleted ${this.changes} oldest users`);
+        })
+    }
+  })
+  database.run(`DELETE FROM "users" WHERE username = ?`, 
+    [username], function (err) {
+      if (err)
+      {
+        console.log('Error in deleting user')
+        return res.status(500).json({error: 'Database error'})
+      }
+      if (this.changes === 0)
+        console.log(`User not found (new user)`)
+    })
+  database.run(`INSERT INTO "users" (username, avatar) VALUES (?, ?)`, [user.login, user.avatar_url], (err) => {
+    if (err)
+      console.log(`database err: ${err.message}`)
+  })
+}
+
+app.get('/history', async (req, res) => {
+
+  database.all(`SELECT username, avatar FROM "users" ORDER BY datetime(created_at) 
+    DESC LIMIT 5`, [], (err, rows) => {
+      if (err)
+      {
+        console.log('Error in fetching recent search history')
+        return res.status(500).json({error: 'Database error'})
+      }
+      res.status(200).json(rows)
+    })
+})
+
 app.get('/users', async (req, res) => {
-  
+
   let {username} = req.query
   username = username?.trim()
   if (!username) 
@@ -92,6 +153,8 @@ app.get('/users', async (req, res) => {
 
     const createdDate = new Date(user.created_at)
     const activeSince = createdDate.toLocaleDateString('en-US', {year: 'numeric', month: 'long'})
+    
+    databaseOperations(username, user)
 
     res.status(200).json({
       login: user.login,

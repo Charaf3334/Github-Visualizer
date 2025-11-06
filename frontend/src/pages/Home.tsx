@@ -4,6 +4,12 @@ import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import { Loader2 } from 'lucide-react'
 
+interface User
+{
+  username: string,
+  avatar: string
+}
+
 const Home = () => {
 
   const [username, setUsername] = useState('')
@@ -12,6 +18,7 @@ const Home = () => {
   const [loading, setLoading] = useState(false)
   const [wait, setWait] = useState(false)
   const buttonRef = useRef<HTMLButtonElement>(null)
+  const [users, setUsers] = useState<User[]>([])
   const navigate = useNavigate()
   
   const onchangeHandle = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -26,7 +33,16 @@ const Home = () => {
   }
   
   useEffect(() => {
-    const timer = setTimeout(() => {
+    const timer = setTimeout(async () => {
+      try
+      {
+        const {data} = await axios.get(`${import.meta.env.VITE_BACK_URL}/history`)
+        setUsers(data)
+      }
+      catch (err: unknown)
+      {
+        console.log(err)
+      }
       setWait(true)
     }, 1000)
     return () => clearTimeout(timer)
@@ -115,6 +131,25 @@ const Home = () => {
               <p className="text-sm">Please enter your username.</p>
             </div>
           )}
+          <div className="mt-10 w-full max-w-md bg-transparent rounded-xl p-4 backdrop-blur-xs border-3 border-white/10">
+              <h2 className="text-white text-lg font-semibold mb-3">Recently searched</h2>
+              <ul className="space-y-2">
+                {users.map((u, i) => (
+                  <li
+                    key={i}
+                    className="flex justify-between items-center px-3 py-2 bg-white/5 rounded-lg hover:bg-white/15 transition cursor-pointer"
+                    onClick={() => navigate(`/user/${u.username}`)}>
+                    <div className='flex items-center gap-2'>
+                      <span className='w-8 h-8 rounded-full'>
+                        <img src={u.avatar} alt="" className='w-8 h-8 rounded-full' />
+                      </span>
+                      <span className="text-white/90">@{u.username}</span>
+                    </div>
+                    <span className="text-gray-400 text-sm">#{i + 1}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
         </>
       )}
     </div>
