@@ -48,7 +48,6 @@ const checkRate = async () => {
 const getAllRepos = async (username) => {
   let page = 1
   const repos = []
-
   while (true) 
   {
     const {data} = await axios.get(`https://api.github.com/users/${username}/repos?per_page=100&page=${page}`, {headers: getHeaders()})
@@ -59,11 +58,10 @@ const getAllRepos = async (username) => {
       break
     page++
   }
-
   return repos
 }
 
-const databaseOperations = async (username, user) => {
+const databaseOperations = async (req, res, username, user) => {
   database.get(`SELECT COUNT(*) AS count FROM "users"`, (err, row) => {
     if (err)
     {
@@ -103,7 +101,6 @@ const databaseOperations = async (username, user) => {
 }
 
 app.get('/history', async (req, res) => {
-
   database.all(`SELECT username, avatar FROM "users" ORDER BY datetime(created_at) DESC LIMIT 5`, [], (err, rows) => {
     if (err)
     {
@@ -115,12 +112,10 @@ app.get('/history', async (req, res) => {
 })
 
 app.get('/users', async (req, res) => {
-
   let {username} = req.query
   username = username?.trim()
   if (!username) 
     return res.status(400).json({error: 'Username is required'})
-
   try 
   {
     await checkRate()
@@ -143,17 +138,15 @@ app.get('/users', async (req, res) => {
       allStars += repo.stargazers_count || 0;
     })
     }
-
     const total = Object.values(languages).reduce((a, b) => a + b, 0)
     const languagePercentages = {}
     for (const [lang, bytes] of Object.entries(languages)) {
       languagePercentages[lang] = Math.round((bytes / total) * 100)
     }
-
     const createdDate = new Date(user.created_at)
     const activeSince = createdDate.toLocaleDateString('en-US', {year: 'numeric', month: 'long'})
     
-    databaseOperations(username, user)
+    databaseOperations(req, res, username, user)
 
     res.status(200).json({
       login: user.login,
@@ -175,11 +168,9 @@ app.get('/users', async (req, res) => {
 })
 
 app.get('/users/:username/repos', async (req, res) => {
-  
   const {username} = req.params
   if (!username) 
     return res.status(400).json({error: 'Username is required'})
-
   try 
   {
     await checkRate()
@@ -195,11 +186,9 @@ app.get('/users/:username/repos', async (req, res) => {
 })
 
 app.get('/users/:username/:type', async (req, res) => {
-  
   const {username, type} = req.params
   if (!username || !type) 
     return res.status(400).json({error: 'Username and type are required'})
-  
   if (type !== 'followers' && type !== 'following') 
     return res.status(400).json({error: 'Type must be followers or following'})
   const perPage = 100
