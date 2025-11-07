@@ -202,12 +202,19 @@ app.get('/users/:username/:type', async (req, res) => {
   
   if (type !== 'followers' && type !== 'following') 
     return res.status(400).json({error: 'Type must be followers or following'})
-
+  const perPage = 100
   try 
   {
     await checkRate()
-    const {data} = await axios.get(`https://api.github.com/users/${username}/${type}`, {headers: getHeaders()})
-    res.status(200).json(data)
+    const res1 = await axios.get(`https://api.github.com/users/${username}/${type}`, {headers: getHeaders(), params: {per_page: perPage, page: 1}})
+    const data1 = res1.data
+    let data2 = []
+    if (data1.length === perPage)
+    {
+      const res2 = await axios.get(`https://api.github.com/users/${username}/${type}`, {headers: getHeaders(), params: {per_page: perPage, page: 2}})
+      data2 = res2.data
+    }
+    res.status(200).json(data1.concat(data2))
   } 
   catch (err) 
   {
