@@ -90,13 +90,13 @@ const Home = () => {
       ) 
       : (
         <>
-          <h1 className="text-white text-5xl md:text-6xl font-bold leading-tight">
+          <h1 className="text-white text-[42px] md:text-6xl font-bold leading-tight mt-25 md:mt-0">
             Visualize Your Github Account
           </h1>
-          <p className="text-gray-400 text-lg md:text-xl mt-2">
+          <p className="text-gray-400 text-[15px] md:text-xl mt-2">
             Your developer journey in one view. 
           </p>
-          <div className={`flex w-full mt-15 border-2 ${isEmpty || notFound ? 'border-red-500' : 'border-white/30'} rounded-xl overflow-hidden hover:shadow-xl transition-shadow duration-300 shadow-2xl`}>
+          <div className={`flex w-full mt-8 md:mt-15 border-2 ${isEmpty || notFound ? 'border-red-500' : 'border-white/30'} rounded-xl overflow-hidden hover:shadow-xl transition-shadow duration-300 shadow-2xl`}>
             <input
               type="text"
               value={username}
@@ -104,7 +104,7 @@ const Home = () => {
               onKeyDown={handleKeyDown}
               tabIndex={0}
               placeholder="Enter your Github username"
-              className="flex-1 px-5 py-3 text-white text-base md:text-lg placeholder:text-gray-400 outline-none bg-transparent"/>
+              className="flex-1 px-5 py-3 text-white text-sm md:text-lg placeholder:text-gray-400 outline-none bg-transparent"/>
               <button 
                 className="px-5 py-3 bg-white/30 hover:bg-white/35 transition-colors duration-300 text-white flex items-center justify-center cursor-pointer"
                 onClick={handleSearch}
@@ -115,19 +115,23 @@ const Home = () => {
                   <Loader2 className="animate-spin h-4 w-4 md:h-5 md:w-5 text-white" />
                 ) 
                 : (
-                  <i className="bx bx-search text-white text-lg md:text-xl"></i>
+                  <i className="bx bx-search text-white text-sm md:text-xl"></i>
                 )}
               </button>
           </div>
           {notFound && (
             <div className="flex items-center gap-2 text-red-500 mt-2">
-              <i className="bx bx-error text-red-500 text-sm md:text-base"></i>
+              <div className='hidden md:flex'>
+                <i className="bx bx-error text-red-500 text-sm md:text-base"></i>
+              </div>
               <p className="text-sm">This username doesn't exist, please enter a valid one.</p>
             </div>
           )}
           {isEmpty && (
             <div className="flex items-center gap-2 text-red-500 mt-2">
-              <i className="bx bx-error text-red-500 text-sm md:text-base"></i>
+              <div className='hidden md:flex'>
+                <i className="bx bx-error text-red-500 text-sm md:text-base"></i>
+              </div>
               <p className="text-sm">Please enter your username.</p>
             </div>
           )}
@@ -137,13 +141,13 @@ const Home = () => {
                 {users.map((u, i) => (
                   <li
                     key={i}
-                    className="flex justify-between items-center px-3 py-2 bg-white/5 rounded-lg hover:bg-white/15 transition cursor-pointer"
+                    className="flex justify-between items-center px-3 py-2 bg-white/5 rounded-lg hover:bg-white/15 transition-colors duration-300 cursor-pointer"
                     onClick={() => navigate(`/user/${u.username}`)}>
                     <div className='flex items-center gap-2'>
                       <span className='w-8 h-8 rounded-full'>
                         <img src={u.avatar} alt="" className='w-8 h-8 rounded-full' />
                       </span>
-                      <span className="text-white/90">@{u.username}</span>
+                      <span className="text-white/90">@{u.username.length > 22 ? u.username.slice(0, 15) + '...' : u.username}</span>
                     </div>
                     <span className="text-gray-400 text-sm">#{i + 1}</span>
                   </li>

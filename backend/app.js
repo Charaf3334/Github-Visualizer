@@ -104,15 +104,14 @@ const databaseOperations = async (username, user) => {
 
 app.get('/history', async (req, res) => {
 
-  database.all(`SELECT username, avatar FROM "users" ORDER BY datetime(created_at) 
-    DESC LIMIT 5`, [], (err, rows) => {
-      if (err)
-      {
-        console.log('Error in fetching recent search history')
-        return res.status(500).json({error: 'Database error'})
-      }
-      res.status(200).json(rows)
-    })
+  database.all(`SELECT username, avatar FROM "users" ORDER BY datetime(created_at) DESC LIMIT 5`, [], (err, rows) => {
+    if (err)
+    {
+      console.log('Error in fetching recent search history')
+      return res.status(500).json({error: 'Database error'})
+    }
+    res.status(200).json(rows)
+  })
 })
 
 app.get('/users', async (req, res) => {
@@ -184,8 +183,10 @@ app.get('/users/:username/repos', async (req, res) => {
   try 
   {
     await checkRate()
-    const {data: repos} = await axios.get(`https://api.github.com/users/${username}/repos?sort=stars&per_page=5`, {headers: getHeaders()})
-    res.status(200).json(repos)
+    const {data: repos} = await axios.get(`https://api.github.com/users/${username}/repos?per_page=100`, {headers: getHeaders()})
+    const sorted = repos.sort((a, b) => b.stargazers_count - a.stargazers_count)
+    const top5 = sorted.slice(0, 5)
+    res.status(200).json(top5)
   } 
   catch (err) 
   {

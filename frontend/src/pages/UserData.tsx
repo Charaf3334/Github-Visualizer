@@ -52,7 +52,30 @@ const UserData = () => {
   const [listUsers, setListUsers] = useState<User[]>([])
   const [loadingList, setLoadingList] = useState(false)
   const COLORS = ['#e91e63', '#9c27b0', '#ff9800', '#4caf50', '#f44336', '#2196f3', '#ffc107', '#00bcd4']
-  
+  const languageColors: Record<string, string> = {
+    "Python": "#4B8BBE",
+    "JavaScript": "#F7DF1E",
+    "TypeScript": "#3178C6",
+    "Java": "#007396",
+    "C": "#A8B9CC",
+    "C++": "#00599C",
+    "C#": "#178600",
+    "Go": "#00ADD8",
+    "Rust": "#D34516",
+    "Ruby": "#CC342D",
+    "PHP": "#777BB4",
+    "Swift": "#FA7343",
+    "Kotlin": "#0095D5",
+    "R": "#165CAA",
+    "Scala": "#DC322F",
+    "Haskell": "#5E5086",
+    "Elixir": "#6E4A7E",
+    "Lua": "#000080",
+    "Perl": "#0298C3",
+    "Dart": "#0175C2",
+    "Jupyter Notebook": "#f44336"
+}
+
   useEffect(() => {
     if (!login) 
       return
@@ -172,7 +195,7 @@ const UserData = () => {
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div className="bg-white/5 backdrop-blur-sm border border-white/10 p-6 rounded-2xl shadow-xl">
-            <h2 className="text-2xl font-bold mb-6">Languages</h2>
+            <h2 className="text-2xl font-bold mb-6 text-center md:text-left">Languages</h2>
             {displayedLangs.length 
             ? (
               <div className="h-96">
@@ -201,9 +224,9 @@ const UserData = () => {
            : <p className="text-gray-400 text-center py-12">No language data available</p>}
           </div>
           <div className="bg-white/5 backdrop-blur-sm border border-white/10 p-6 rounded-2xl shadow-xl">
-            <div className='flex justify-between'>
-              <h2 className="text-2xl font-bold mb-6">Top Repositories</h2>
-              <span className='kadwa-bold'>Total stars: <span className='text-yellow-400'>{user.all_stars}</span></span>
+            <div className='flex flex-col md:flex-row text-center justify-between'>
+              <h2 className="text-2xl font-bold mb-3 md:mb-6">Top Repositories</h2>
+              <span className='kadwa-bold text-sm md:mt-2 mb-3'>Total stars: <span className='text-yellow-400'>{user.all_stars}</span></span>
             </div>
             {topRepos.length 
             ? (
@@ -223,7 +246,7 @@ const UserData = () => {
                       <div className="flex items-center gap-1"><Eye size={16} className="text-green-400" /> {repo.watchers_count}</div>
                       {repo.language && (
                         <div className="flex items-center gap-1">
-                          <span className="w-3 h-3 rounded-full" style={{background: `linear-gradient(90deg, #9c27b0, #ff9800)`}}></span> {repo.language}
+                          <span className={`w-3 h-3 rounded-full`} style={{backgroundColor: languageColors[repo.language] || "rgba(255, 255, 255, 0.6)"}}></span> {repo.language}
                         </div>
                       )}
                     </div>

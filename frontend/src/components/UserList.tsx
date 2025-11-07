@@ -51,7 +51,7 @@ const UserList = ({title, users, onClose, onSelect, loading = false}: UserListPr
                   alt={u.login}
                   className="w-10 h-10 rounded-full border border-gray-700"/>
                 <div>
-                  <span className="font-semibold text-white">{u.login}</span>
+                  <span className="font-semibold text-white">{u.login.length > 32 ? u.login.slice(0, 30) + '...' : u.login}</span>
                   <p className="text-xs text-gray-400">@{u.login}</p>
                 </div>
               </button>
