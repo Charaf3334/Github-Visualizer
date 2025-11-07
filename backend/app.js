@@ -254,7 +254,7 @@ app.get('/contributions/:username', async (req, res) => {
     if (!repoNames.length)
       return res.status(200).json({username, contributions: []})
     await checkRate()
-    const repoDetails = await Promise.allSettled(repoNames.map(fullName =>axios.get(`https://api.github.com/repos/${fullName}`, {headers: getHeaders()})))
+    const repoDetails = await Promise.allSettled(repoNames.map(fullName => axios.get(`https://api.github.com/repos/${fullName}`, {headers: getHeaders()})))
     const contributions = repoDetails.filter(r => r.status === 'fulfilled').map(r => {
       const repo = r.value.data
         return {
