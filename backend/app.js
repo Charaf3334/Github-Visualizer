@@ -20,6 +20,14 @@ const database = new sqlite3.Database('./history.sqlite', (err) => {
     console.log('Database connected')
 })
 
+
+app.use((req, res, next) => {
+  const key = req.headers['api-key']
+  if (key !== process.env.API_KEY)
+    return res.status(403).json({error: 'Forbidden'})
+  next()
+})
+
 const tokens = [process.env.GITHUB_TOKEN1, process.env.GITHUB_TOKEN2]
 let currentTokenIndex = 0
 

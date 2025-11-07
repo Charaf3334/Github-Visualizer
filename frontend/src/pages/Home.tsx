@@ -36,7 +36,7 @@ const Home = () => {
     const timer = setTimeout(async () => {
       try
       {
-        const {data} = await axios.get(`${import.meta.env.VITE_BACK_URL}/history`)
+        const {data} = await axios.get(`${import.meta.env.VITE_BACK_URL}/history`, {headers: {'api-key': import.meta.env.VITE_API_KEY}})
         setUsers(data)
       }
       catch (err: unknown)
@@ -60,7 +60,8 @@ const Home = () => {
     {
       await new Promise(res => setTimeout(res, 1000))
       const {data} = await axios.get(`${import.meta.env.VITE_BACK_URL}/users`, {
-        params: {username}
+        params: {username},
+        headers: {'api-key': import.meta.env.VITE_API_KEY}
       })
       setNotFound(false)
       navigate(`/user/${data.login}`)

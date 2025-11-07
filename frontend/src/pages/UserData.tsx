@@ -82,7 +82,7 @@ const UserData = () => {
     const fetchData = async () => {
       try 
       {
-        const {data: u} = await axios.get<User>(`${import.meta.env.VITE_BACK_URL}/users`, {params: {username: login}})
+        const {data: u} = await axios.get<User>(`${import.meta.env.VITE_BACK_URL}/users`, {params: {username: login}, headers: {'api-key': import.meta.env.VITE_API_KEY}})
         setUser(u)
         setNotFound(false)
         if (u.languages) 
@@ -93,7 +93,7 @@ const UserData = () => {
             .sort((a, b) => b.value - a.value)
           setLanguages(langs)
         }
-        const {data: repos} = await axios.get<Repo[]>(`${import.meta.env.VITE_BACK_URL}/users/${login}/repos`)
+        const {data: repos} = await axios.get<Repo[]>(`${import.meta.env.VITE_BACK_URL}/users/${login}/repos`, {headers: {'api-key': import.meta.env.VITE_API_KEY}})
         setTopRepos(repos)
       } 
       catch 
@@ -118,7 +118,7 @@ const UserData = () => {
     
     try 
     {
-      const {data} = await axios.get(`${import.meta.env.VITE_BACK_URL}/users/${login}/${type}`)
+      const {data} = await axios.get(`${import.meta.env.VITE_BACK_URL}/users/${login}/${type}`, {headers: {'api-key': import.meta.env.VITE_API_KEY}})
       setListUsers(data)
     } 
     catch 
