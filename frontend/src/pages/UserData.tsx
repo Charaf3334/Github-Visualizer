@@ -115,7 +115,6 @@ const UserData = () => {
       return
     setShowList(type)
     setLoadingList(true)
-    
     try 
     {
       const {data} = await axios.get(`${import.meta.env.VITE_BACK_URL}/users/${login}/${type}`, {headers: {'api-key': import.meta.env.VITE_API_KEY}})

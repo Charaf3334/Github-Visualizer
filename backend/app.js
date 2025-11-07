@@ -12,7 +12,7 @@ app.use(express.json())
 
 const port = process.env.PORT
 
-sqlite3.verbose();
+sqlite3.verbose()
 const database = new sqlite3.Database('./history.sqlite', (err) => {
   if (err)
     console.log(err.message)
@@ -88,7 +88,7 @@ const databaseOperations = async (req, res, username, user) => {
             console.log('Error in deleting rows')
             return res.status(500).json({error: 'Database error'})
           }
-          console.log(`Deleted ${this.changes} oldest users`);
+          console.log(`Deleted ${this.changes} oldest users`)
         })
     }
   })
@@ -143,7 +143,7 @@ app.get('/users', async (req, res) => {
             languages[lang] = (languages[lang] || 0) + bytes
     })
     chunk.forEach(repo => {
-      allStars += repo.stargazers_count || 0;
+      allStars += repo.stargazers_count || 0
     })
     }
     const total = Object.values(languages).reduce((a, b) => a + b, 0)
@@ -216,6 +216,62 @@ app.get('/users/:username/:type', async (req, res) => {
   catch (err) 
   {
     res.status(err.response?.status || 500).json({error: `Failed to fetch ${type}`})
+  }
+})
+
+app.get('/contributions/:username', async (req, res) => {
+  const {username} = req.params
+  if (!username)
+    return res.status(400).json({error: 'Username is required'})
+  let page = 1
+  const perPage = 100
+  const repoMap = {}
+  try 
+  {
+    await checkRate()
+    while (true) 
+    {
+      const response = await axios.get(
+        `https://api.github.com/search/commits?q=author:${username}&per_page=${perPage}&page=${page}`,
+        {headers: {Accept: 'application/vnd.github.cloak-preview+json', ...getHeaders()}})
+      const commits = response.data.items
+      if (!commits || commits.length === 0) 
+        break
+      commits.forEach((commit) => {
+        const repo = commit.repository
+        const owner = repo.owner.login
+        if (owner.toLowerCase() !== username.toLowerCase()) 
+        {
+          const name = repo.full_name
+          repoMap[name] = (repoMap[name] || 0) + 1
+        }
+      })
+      if (commits.length < perPage) 
+        break
+      page++
+    }
+    const repoNames = Object.keys(repoMap)
+    if (!repoNames.length)
+      return res.status(200).json({username, contributions: []})
+    await checkRate()
+    const repoDetails = await Promise.allSettled(repoNames.map(fullName =>axios.get(`https://api.github.com/repos/${fullName}`, {headers: getHeaders()})))
+    const contributions = repoDetails.filter(r => r.status === 'fulfilled').map(r => {
+      const repo = r.value.data
+        return {
+          name: repo.full_name,
+          html_url: repo.html_url,
+          description: repo.description,
+          stars: repo.stargazers_count,
+          forks: repo.forks_count,
+          language: repo.language,
+          commits_by_user: repoMap[repo.full_name],
+        }
+      })
+    res.status(200).json({username, contributions})
+  } 
+  catch (err) 
+  {
+    res.status(500).json({error: err.response?.data || 'Error fetching contributions'})
   }
 })
 
