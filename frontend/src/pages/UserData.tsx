@@ -181,14 +181,14 @@ const UserData = () => {
               <div
                 onClick={() => handleListOpen('followers')}
                 className="cursor-pointer hover:text-white transition">
-                <span className="text-1xl font-bold text-white">{user.followers}</span> Followers
+                <span className="text-1xl font-bold text-white">{user.followers}</span> {user.followers == 1 ? "Follower" : "Followers"}
               </div>
               <div
                 onClick={() => handleListOpen('following')}
                 className="cursor-pointer hover:text-white transition">
                 <span className="text-1xl font-bold text-white">{user.following}</span> Following
               </div>
-              <div><span className="text-1xl font-bold text-white">{user.public_repos}</span> Repositories</div>
+              <div><span className="text-1xl font-bold text-white">{user.public_repos}</span> {user.public_repos == 1 ? "Repository" : "Repositories"}</div>
             </div>
           </div>
         </div>
