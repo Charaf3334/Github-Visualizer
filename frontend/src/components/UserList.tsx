@@ -1,4 +1,5 @@
 import { X, Loader2 } from 'lucide-react'
+import { Link } from 'react-router-dom'
 
 interface MiniUser 
 {
@@ -39,25 +40,30 @@ const UserList = ({title, users, onClose, onSelect, loading = false}: UserListPr
             <p className="text-gray-400">Loading users...</p>
           </div>
         ) 
-        : users.length ? (
+        : 
+        users.length 
+        ? (
           <div className="space-y-3">
             {users.map((u) => (
-              <button
-                key={u.login}
-                onClick={() => onSelect(u.login)}
-                className="flex cursor-pointer items-center gap-4 w-full p-3 rounded-xl transition bg-[#1a1a1a] hover:bg-[#242424] border border-transparent hover:border-gray-700 text-left">
-                <img
-                  src={u.avatar_url}
-                  alt={u.login}
-                  className="w-10 h-10 rounded-full border border-gray-700"/>
-                <div>
-                  <span className="font-semibold text-white">{u.login.length > 32 ? u.login.slice(0, 30) + '...' : u.login}</span>
-                  <p className="text-xs text-gray-400">@{u.login}</p>
-                </div>
-              </button>
+              <Link to={`/user/${u.login}`} className='flex '>
+                <button
+                  key={u.login}
+                  onClick={() => onSelect(u.login)}
+                  className="flex cursor-pointer items-center gap-4 w-full p-3 rounded-xl transition bg-[#1a1a1a] hover:bg-[#242424] border border-transparent hover:border-gray-700 text-left">
+                  <img
+                    src={u.avatar_url}
+                    alt={u.login}
+                    className="w-10 h-10 rounded-full border border-gray-700"/>
+                  <div>
+                    <span className="font-semibold text-white">{u.login.length > 32 ? u.login.slice(0, 30) + '...' : u.login}</span>
+                    <p className="text-xs text-gray-400">@{u.login}</p>
+                  </div>
+                </button>
+              </Link>
             ))}
           </div>
-        ) : (
+        ) 
+        : (
           <p className="text-gray-400 text-center py-12">No users found</p>
         )}
       </div>

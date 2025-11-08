@@ -1,15 +1,15 @@
-import { useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { Star } from 'lucide-react'
 
 const Navbar = () => {
-  const navigate = useNavigate()
 
   return (
     <nav className="kadwa-regular px-8 py-4 flex justify-around items-center">
       <span
-        className="md:text-3xl text-[20px] font-bold text-white tracking-wide hover:text-white/90 transition-colors duration-500 ease-out transform cursor-pointer"
-        onClick={() => navigate('/home')}>
-        Git Visualizer
+        className="md:text-3xl text-[20px] font-bold text-white tracking-wide hover:text-white/90 transition-colors duration-500 ease-out transform cursor-pointer">
+        <Link to="/home">
+          Git Visualizer
+        </Link>
       </span>
       <button
         onClick={() => window.open('https://github.com/Charaf3334/Github-Visualizer', '_blank')}

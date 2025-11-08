@@ -1,7 +1,7 @@
 import Navbar from '../components/Navbar'
 import { useState, useEffect, useRef } from 'react'
 import axios from 'axios'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { Loader2 } from 'lucide-react'
 
 interface User
@@ -142,15 +142,18 @@ const Home = () => {
                 {users.map((u, i) => (
                   <li
                     key={i}
-                    className="flex justify-between items-center px-3 py-2 bg-white/5 rounded-lg hover:bg-white/15 transition-colors duration-300 cursor-pointer"
-                    onClick={() => navigate(`/user/${u.username}`)}>
-                    <div className='flex items-center gap-2'>
-                      <span className='w-8 h-8 rounded-full'>
-                        <img src={u.avatar} alt="" className='w-8 h-8 rounded-full' />
-                      </span>
-                      <span className="text-white/90">@{u.username.length > 22 ? u.username.slice(0, 15) + '...' : u.username}</span>
-                    </div>
-                    <span className="text-gray-400 text-sm">#{i + 1}</span>
+                    className="flex justify-between items-center px-3 py-2 bg-white/5 rounded-lg hover:bg-white/15 transition-colors duration-300 cursor-pointer">
+                    <Link
+                      to={`/user/${u.username}`}
+                      className="flex justify-between items-center w-full">
+                      <div className='flex items-center gap-2'>
+                        <span className='w-8 h-8 rounded-full'>
+                          <img src={u.avatar} alt="" className='w-8 h-8 rounded-full' />
+                        </span>
+                        <span className="text-white/90">@{u.username.length > 22 ? u.username.slice(0, 15) + '...' : u.username}</span>
+                      </div>
+                      <span className="text-gray-400 text-sm">#{i + 1}</span>
+                    </Link>
                   </li>
                 ))}
               </ul>

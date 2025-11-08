@@ -30,7 +30,6 @@ app.use((req, res, next) => {
 
 const tokens = [process.env.GITHUB_TOKEN1, process.env.GITHUB_TOKEN2]
 let currentTokenIndex = 0
-
 const getCurrentToken = () => tokens[currentTokenIndex]
 const getHeaders = () => ({Authorization: `token ${getCurrentToken()}`})
 
@@ -40,8 +39,7 @@ const checkRate = async () => {
     const res = await axios.get('https://api.github.com/rate_limit', {headers: getHeaders()})
     const {remaining, limit, reset} = res.data.rate
     console.log(`Token ${currentTokenIndex + 1}: ${remaining}/${limit} remaining, resets at ${new Date(reset * 1000)}`)
-
-    if (remaining < 10) 
+    if (remaining < 100) 
     {
       currentTokenIndex = (currentTokenIndex + 1) % tokens.length
       console.log(`Switching to token ${currentTokenIndex + 1}`)
@@ -69,43 +67,58 @@ const getAllRepos = async (username) => {
   return repos
 }
 
-const databaseOperations = async (req, res, username, user) => {
-  database.get(`SELECT COUNT(*) AS count FROM "users"`, (err, row) => {
-    if (err)
-    {
-      console.log('Error in counting rows')
-      return res.status(500).json({error: 'Database error'})
-    }
-    if (row.count >= 20)
-    {
-      database.run(`DELETE FROM "users" WHERE id IN (
-        SELECT id FROM "users"
-        ORDER BY datetime(created_at) ASC
-        LIMIT 10
-        )`, function (err) {
-          if (err)
-          {
-            console.log('Error in deleting rows')
-            return res.status(500).json({error: 'Database error'})
-          }
-          console.log(`Deleted ${this.changes} oldest users`)
-        })
-    }
-  })
-  database.run(`DELETE FROM "users" WHERE username = ?`, 
-    [username], function (err) {
-      if (err)
-      {
-        console.log('Error in deleting user')
-        return res.status(500).json({error: 'Database error'})
-      }
-      if (this.changes === 0)
-        console.log(`User not found (new user)`)
+const databaseOperations = async (username, user) => {
+  try 
+  {
+    const row = await new Promise((resolve, reject) => {database.get(`SELECT COUNT(*) AS count FROM "users"`, (err, row) => {
+      if (err) 
+        reject(err)
+      else 
+      resolve(row)
     })
-  database.run(`INSERT INTO "users" (username, avatar) VALUES (?, ?)`, [user.login, user.avatar_url], (err) => {
-    if (err)
-      console.log(`database err: ${err.message}`)
-  })
+    })
+    if (row.count >= 20) 
+    {
+      await new Promise((resolve, reject) => {database.run(`DELETE FROM "users" WHERE id IN (
+          SELECT id FROM "users"
+          ORDER BY datetime(created_at) ASC
+          LIMIT 10
+        )`, function (err) {
+          if (err) 
+            reject(err)
+          else 
+          {
+            console.log(`Deleted ${this.changes} oldest users`)
+            resolve()
+          }
+        })
+      })
+    }
+    await new Promise((resolve, reject) => {database.run(`DELETE FROM "users" WHERE username = ?`, [username], function (err) {
+        if (err) 
+          reject(err)
+        else 
+        {
+          if (this.changes === 0) 
+            console.log(`User not found (new user)`)
+          resolve()
+        }
+      })
+    })
+    await new Promise((resolve, reject) => {database.run(`INSERT INTO "users" (username, avatar) VALUES (?, ?)`, 
+      [user.login, user.avatar_url], (err) => {
+        if (err) 
+          reject(err)
+        else 
+          resolve()
+      })
+    })
+  } 
+  catch (err) 
+  {
+    console.log('Database error:', err.message)
+    throw err
+  }
 }
 
 app.get('/history', async (req, res) => {
@@ -132,29 +145,27 @@ app.get('/users', async (req, res) => {
     const languages = {}
     const SIZE = 5
     let allStars = 0
-
     for (let i = 0; i < repos.length; i += SIZE) 
     {
-      const chunk = repos.slice(i, i + SIZE)
-      const results = await Promise.allSettled(chunk.map(repo => axios.get(repo.languages_url, {headers: getHeaders()})))
-      results.forEach(r => {
-        if (r.status === 'fulfilled')
-          for (const [lang, bytes] of Object.entries(r.value.data))
-            languages[lang] = (languages[lang] || 0) + bytes
-    })
-    chunk.forEach(repo => {
-      allStars += repo.stargazers_count || 0
-    })
+        const chunk = repos.slice(i, i + SIZE)
+        const results = await Promise.allSettled(chunk.map(repo => axios.get(repo.languages_url, {headers: getHeaders()})))
+        results.forEach(r => {
+          if (r.status === 'fulfilled')
+            for (const [lang, bytes] of Object.entries(r.value.data))
+              languages[lang] = (languages[lang] || 0) + bytes
+      })
+      chunk.forEach(repo => {
+        allStars += repo.stargazers_count || 0
+      })
     }
     const total = Object.values(languages).reduce((a, b) => a + b, 0)
     const languagePercentages = {}
-    for (const [lang, bytes] of Object.entries(languages)) {
+    for (const [lang, bytes] of Object.entries(languages))
       languagePercentages[lang] = Math.round((bytes / total) * 100)
-    }
     const createdDate = new Date(user.created_at)
     const activeSince = createdDate.toLocaleDateString('en-US', {year: 'numeric', month: 'long'})
     
-    databaseOperations(req, res, username, user)
+    await databaseOperations(username, user)
 
     res.status(200).json({
       login: user.login,
@@ -219,60 +230,5 @@ app.get('/users/:username/:type', async (req, res) => {
   }
 })
 
-app.get('/contributions/:username', async (req, res) => {
-  const {username} = req.params
-  if (!username)
-    return res.status(400).json({error: 'Username is required'})
-  let page = 1
-  const perPage = 100
-  const repoMap = {}
-  try 
-  {
-    await checkRate()
-    while (true) 
-    {
-      const response = await axios.get(
-        `https://api.github.com/search/commits?q=author:${username}&per_page=${perPage}&page=${page}`,
-        {headers: {Accept: 'application/vnd.github.cloak-preview+json', ...getHeaders()}})
-      const commits = response.data.items
-      if (!commits || commits.length === 0) 
-        break
-      commits.forEach((commit) => {
-        const repo = commit.repository
-        const owner = repo.owner.login
-        if (owner.toLowerCase() !== username.toLowerCase()) 
-        {
-          const name = repo.full_name
-          repoMap[name] = (repoMap[name] || 0) + 1
-        }
-      })
-      if (commits.length < perPage) 
-        break
-      page++
-    }
-    const repoNames = Object.keys(repoMap)
-    if (!repoNames.length)
-      return res.status(200).json({username, contributions: []})
-    await checkRate()
-    const repoDetails = await Promise.allSettled(repoNames.map(fullName => axios.get(`https://api.github.com/repos/${fullName}`, {headers: getHeaders()})))
-    const contributions = repoDetails.filter(r => r.status === 'fulfilled').map(r => {
-      const repo = r.value.data
-        return {
-          name: repo.full_name,
-          html_url: repo.html_url,
-          description: repo.description,
-          stars: repo.stargazers_count,
-          forks: repo.forks_count,
-          language: repo.language,
-          commits_by_user: repoMap[repo.full_name],
-        }
-      })
-    res.status(200).json({username, contributions})
-  } 
-  catch (err) 
-  {
-    res.status(500).json({error: err.response?.data || 'Error fetching contributions'})
-  }
-})
 
 app.listen(port, () => console.log(`Server running on port: ${port}`))
