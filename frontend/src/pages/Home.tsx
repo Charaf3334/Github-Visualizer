@@ -82,7 +82,7 @@ const Home = () => {
   return (
   <div className="relative min-h-screen">
     <Navbar />
-    <div className="kadwa-regular flex flex-col items-center justify-center text-center absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 px-4 w-full max-w-2xl">
+    <div className="lora-regular flex flex-col items-center justify-center text-center absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 px-4 w-full max-w-2xl">
       {!wait 
       ? (
         <div className="flex justify-center mt-20">
@@ -92,7 +92,7 @@ const Home = () => {
       : (
         <>
           <h1 className="text-white text-[42px] md:text-6xl font-bold leading-tight mt-25 md:mt-0">
-            Visualize Your Github Account
+            Visualize Your <br/> Github Account
           </h1>
           <p className="text-gray-400 text-[15px] md:text-xl mt-2">
             Your developer journey in one view. 
@@ -146,11 +146,18 @@ const Home = () => {
                     <Link
                       to={`/user/${u.username}`}
                       className="flex justify-between items-center w-full">
-                      <div className='flex items-center gap-2'>
-                        <span className='w-8 h-8 rounded-full'>
-                          <img src={u.avatar} alt="" className='w-8 h-8 rounded-full' />
-                        </span>
-                        <span className="text-white/90">@{u.username.length > 22 ? u.username.slice(0, 15) + '...' : u.username}</span>
+                      <div className="flex items-center gap-2">
+                        <img
+                          src={u.avatar}
+                          alt={u.username}
+                          className="w-8 h-8 rounded-full object-cover"
+                        />
+                        <div className="flex flex-col">
+                          <span className="text-white/90 text-left">
+                            {u.username.length > 22 ? u.username.slice(0, 15) + '...' : u.username}
+                          </span>
+                          <span className="text-gray-400 text-xs text-left lora-italic">@{u.username}</span>
+                        </div>
                       </div>
                       <span className="text-gray-400 text-sm">#{i + 1}</span>
                     </Link>

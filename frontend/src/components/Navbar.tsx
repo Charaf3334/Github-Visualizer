@@ -4,7 +4,7 @@ import { Star } from 'lucide-react'
 const Navbar = () => {
 
   return (
-    <nav className="kadwa-regular px-8 py-4 flex justify-around items-center">
+    <nav className="lora-regular px-8 py-4 flex justify-around items-center">
       <span
         className="md:text-3xl text-[20px] font-bold text-white tracking-wide hover:text-white/90 transition-colors duration-500 ease-out transform cursor-pointer">
         <Link to="/home">

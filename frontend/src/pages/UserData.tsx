@@ -132,7 +132,7 @@ const UserData = () => {
   if (loading) 
   {
     return (
-      <div className="min-h-screen text-white kadwa-regular">
+      <div className="min-h-screen text-white lora-regular">
         <Navbar />
         <div className="flex justify-center mt-20">
           <Loader2 size={40} className="animate-spin text-white/10 mb-4" />
@@ -155,7 +155,7 @@ const UserData = () => {
   const showSmallBars = languages.length < 3 ? true : false
 
   return (
-    <div className="min-h-screen text-white kadwa-regular">
+    <div className="min-h-screen text-white lora-regular">
       <Navbar />
       <div className="max-w-6xl mx-auto px-4 py-10 mt-6">
         <div className="bg-linear-to-br from-gray-500/10 to-purple-500/2 backdrop-blur-sm border border-white/10 p-8 rounded-2xl shadow-2xl mb-8 flex flex-col md:flex-row items-center gap-6">
@@ -225,7 +225,7 @@ const UserData = () => {
           <div className="bg-white/5 backdrop-blur-sm border border-white/10 p-6 rounded-2xl shadow-xl">
             <div className='flex flex-col md:flex-row text-center justify-between'>
               <h2 className="text-2xl font-bold mb-3 md:mb-6">Top Repositories</h2>
-              <span className='kadwa-bold text-sm md:mt-2 mb-3'>Total stars: <span className='text-yellow-400'>{user.all_stars}</span></span>
+              <span className='lora-bold text-sm md:mt-2 mb-3'>Total stars: <span className='text-yellow-400'>{user.all_stars}</span></span>
             </div>
             {topRepos.length 
             ? (

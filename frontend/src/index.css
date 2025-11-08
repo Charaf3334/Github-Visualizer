@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,700;1,400;1,700&display=swap');
 @import 'tailwindcss';
 
 .kadwa-regular {
@@ -8,4 +9,28 @@
 .kadwa-bold {
   font-family: "Kadwa", serif;
   font-weight: 700;
+}
+
+.lora-regular {
+  font-family: "Lora", serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.lora-bold {
+  font-family: "Lora", serif;
+  font-weight: 700;
+  font-style: normal;
+}
+
+.lora-italic {
+  font-family: "Lora", serif;
+  font-weight: 400;
+  font-style: italic;
+}
+
+.lora-bolditalic {
+  font-family: "Lora", serif;
+  font-weight: 700;
+  font-style: italic;
 }
