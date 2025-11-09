@@ -31,7 +31,7 @@ app.use((req, res, next) => {
   next()
 })
 
-const tokens = [process.env.GITHUB_TOKEN1, process.env.GITHUB_TOKEN2]
+const tokens = [process.env.GITHUB_TOKEN1, process.env.GITHUB_TOKEN2, process.env.GITHUB_TOKEN3]
 let currentTokenIndex = 0
 const getCurrentToken = () => tokens[currentTokenIndex]
 const getHeaders = () => ({Authorization: `token ${getCurrentToken()}`})
@@ -40,9 +40,9 @@ const checkRate = async () => {
   try 
   {
     const res = await axios.get('https://api.github.com/rate_limit', {headers: getHeaders()})
-    const { remaining, limit, reset } = res.data.rate
+    const {remaining, limit, reset} = res.data.rate
     console.log(`Token ${currentTokenIndex + 1}: ${remaining}/${limit} remaining, resets at ${new Date(reset * 1000)}`)
-    if (remaining < 100) 
+    if (remaining < 500) 
     {
       currentTokenIndex = (currentTokenIndex + 1) % tokens.length
       console.log(`Switching to token ${currentTokenIndex + 1}`)
