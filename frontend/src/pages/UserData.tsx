@@ -52,29 +52,6 @@ const UserData = () => {
   const [listUsers, setListUsers] = useState<User[]>([])
   const [loadingList, setLoadingList] = useState(false)
   const COLORS = ['#e91e63', '#9c27b0', '#ff9800', '#4caf50', '#f44336', '#2196f3', '#ffc107', '#00bcd4']
-  const languageColors: Record<string, string> = {
-    "Python": "#4B8BBE",
-    "JavaScript": "#F7DF1E",
-    "TypeScript": "#3178C6",
-    "Java": "#007396",
-    "C": "#A8B9CC",
-    "C++": "#00599C",
-    "C#": "#178600",
-    "Go": "#00ADD8",
-    "Rust": "#D34516",
-    "Ruby": "#CC342D",
-    "PHP": "#777BB4",
-    "Swift": "#FA7343",
-    "Kotlin": "#0095D5",
-    "R": "#165CAA",
-    "Scala": "#DC322F",
-    "Haskell": "#5E5086",
-    "Elixir": "#6E4A7E",
-    "Lua": "#000080",
-    "Perl": "#0298C3",
-    "Dart": "#0175C2",
-    "Jupyter Notebook": "#f44336"
-}
 
   useEffect(() => {
     if (!login) 
@@ -245,7 +222,15 @@ const UserData = () => {
                       <div className="flex items-center gap-1"><Eye size={16} className="text-green-400" /> {repo.watchers_count}</div>
                       {repo.language && (
                         <div className="flex items-center gap-1">
-                          <span className={`w-3 h-3 rounded-full`} style={{backgroundColor: languageColors[repo.language] || "rgba(255, 255, 255, 0.6)"}}></span> {repo.language}
+                          <img className='w-5 h-5 mr-0.5'
+                            src={`/icons/${repo.language == 'C#' ? "CSharp" : repo.language}.png`}
+                            alt=''
+                            onError={(e) => {
+                              e.currentTarget.src = '/icons/default.png'
+                            }}
+                          >
+                          </img>
+                          <span>{`${repo.language}`}</span>
                         </div>
                       )}
                     </div>
