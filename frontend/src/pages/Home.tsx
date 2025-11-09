@@ -184,7 +184,7 @@ const Home = () => {
                     className="flex justify-between items-center px-3 py-2 bg-white/5 rounded-lg hover:bg-white/15 transition-colors duration-300 cursor-pointer">
                       <div className="flex items-center gap-2">
                         <img
-                          src={`/${language.lang}.png`}
+                          src={`/icons/${language.lang}.png`}
                           alt=""
                           onError={(e) => {
                             e.currentTarget.src = '/default.png'
