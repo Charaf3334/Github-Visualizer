@@ -10,6 +10,12 @@ interface User
   avatar: string
 }
 
+interface LanguageOccur
+{
+  lang: string,
+  percentage: number
+}
+
 const Home = () => {
 
   const [username, setUsername] = useState('')
@@ -19,8 +25,9 @@ const Home = () => {
   const [wait, setWait] = useState(false)
   const buttonRef = useRef<HTMLButtonElement>(null)
   const [users, setUsers] = useState<User[]>([])
+  const [language, setLanguage] = useState<LanguageOccur[]>([])
   const navigate = useNavigate()
-  
+
   const onchangeHandle = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUsername(e.target.value)
     setIsEmpty(false)
@@ -38,6 +45,8 @@ const Home = () => {
       {
         const {data} = await axios.get(`${import.meta.env.VITE_BACK_URL}/history`, {headers: {'api-key': import.meta.env.VITE_API_KEY}})
         setUsers(data)
+        const res = await axios.get(`${import.meta.env.VITE_BACK_URL}/occurences`, {headers: {'api-key': import.meta.env.VITE_API_KEY}})
+        setLanguage(res.data)
       }
       catch (err: unknown)
       {
@@ -82,7 +91,7 @@ const Home = () => {
   return (
   <div className="relative min-h-screen">
     <Navbar />
-    <div className="lora-regular flex flex-col items-center justify-center text-center absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 px-4 w-full max-w-2xl">
+    <div className="lora-regular flex flex-col items-center justify-center text-center absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 px-4 w-full max-w-2xl mt-55 md:mt-0">
       {!wait 
       ? (
         <div className="flex justify-center mt-20">
@@ -136,8 +145,9 @@ const Home = () => {
               <p className="text-sm">Please enter your username.</p>
             </div>
           )}
+          <div className='flex flex-col w-full gap-x-7 md:w-[120%] md:flex-row'>
           <div className="mt-10 w-full max-w-md bg-transparent rounded-xl p-4 backdrop-blur-xs border-3 border-white/10">
-              <h2 className="text-white text-lg font-semibold mb-3">Recently searched</h2>
+              <h2 className="text-white text-lg font-semibold mb-3">Recently searched users</h2>
               <ul className="space-y-2">
                 {users.map((u, i) => (
                   <li
@@ -164,7 +174,35 @@ const Home = () => {
                   </li>
                 ))}
               </ul>
-            </div>
+            </div>  
+          <div className="mt-10 mb-20 w-full max-w-md bg-transparent rounded-xl p-4 backdrop-blur-xs border-3 border-white/10">
+              <h2 className="text-white text-lg font-semibold mb-3">Most loved languages</h2>
+              <ul className="space-y-2">
+                {language.map((language, i) => (
+                  <li
+                    key={i}
+                    className="flex justify-between items-center px-3 py-2 bg-white/5 rounded-lg hover:bg-white/15 transition-colors duration-300 cursor-pointer">
+                      <div className="flex items-center gap-2">
+                        <img
+                          src={`/${language.lang}.png`}
+                          alt=""
+                          onError={(e) => {
+                            e.currentTarget.src = '/default.png'
+                          }}
+                          className="w-6 h-6"
+                        />
+                        <div className="flex flex-col">
+                          <span className="text-white/90 text-left">
+                            {language.lang}
+                          </span>
+                        </div>
+                      </div>
+                      <span className="text-gray-400 text-sm">{language.percentage} %</span>
+                  </li>
+                ))}
+              </ul>
+            </div>  
+          </div>
         </>
       )}
     </div>

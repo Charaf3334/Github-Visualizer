@@ -70,6 +70,35 @@ const getAllRepos = async (username) => {
   return repos
 }
 
+const languageDbOperations = async (languagePercentages, username) => {
+  const client = await pool.connect()
+  try
+  {
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS language_occ (
+        id SERIAL PRIMARY KEY,
+        language TEXT NOT NULL,
+        username TEXT NOT NULL
+        )`)
+    const {rows} = await client.query(`SELECT id FROM language_occ WHERE username = $1`, [username])
+    if (rows.length == 0)
+    {
+      for (const [key, value] of Object.entries(languagePercentages))
+        if (value != 0)
+          await client.query(`INSERT INTO language_occ (language, username) VALUES ($1, $2)`, [key, username])
+    }
+  }
+  catch (err)
+  {
+    console.error('Database error language_occ', err.message)
+    throw err
+  }
+  finally
+  {
+    client.release()
+  }
+}
+
 const databaseOperations = async (username, user) => {
   const client = await pool.connect()
   try 
@@ -93,7 +122,7 @@ const databaseOperations = async (username, user) => {
   } 
   catch (err) 
   {
-    console.error('Database error:', err.message)
+    console.error('Database error users:', err.message)
     throw err
   } 
   finally 
@@ -102,6 +131,28 @@ const databaseOperations = async (username, user) => {
   }
 }
 
+app.get('/occurences', async (req, res) => {
+  try
+  {
+    const {rows} = await pool.query(`
+      SELECT language, COUNT(*) * 100.0 / (SELECT COUNT(*) FROM language_occ) AS global_percentage
+      FROM language_occ GROUP BY language ORDER BY global_percentage DESC;`)
+    const top5 = rows.sort((a, b) => parseFloat(b.global_percentage) - parseFloat(a.global_percentage)).slice(0, 5)
+    const totalTop5 = top5.reduce((sum, item) => sum + parseFloat(item.global_percentage), 0)
+    const OCCURENCES = top5.map((item) => (
+      {
+        lang: item.language,
+        percentage: ((parseFloat(item.global_percentage) / totalTop5) * 100).toFixed(2)
+      }
+    ))
+    res.status(200).json(OCCURENCES)
+  }
+  catch (err)
+  {
+    console.error('Error fetching occurences:', err.message)
+    res.status(500).json({error: 'Database error'})
+  }
+})
 
 app.get('/history', async (req, res) => {
   try 
@@ -112,7 +163,7 @@ app.get('/history', async (req, res) => {
   catch (err) 
   {
     console.error('Error fetching history:', err.message)
-    res.status(500).json({ error: 'Database error' })
+    res.status(500).json({error: 'Database error'})
   }
 })
 
@@ -146,8 +197,9 @@ app.get('/users', async (req, res) => {
       languagePercentages[lang] = Math.round((bytes / total) * 100)
     const createdDate = new Date(user.created_at)
     const activeSince = createdDate.toLocaleDateString('en-US', {year: 'numeric', month: 'long'})
-    
+
     await databaseOperations(username, user)
+    await languageDbOperations(languagePercentages, username)
 
     res.status(200).json({
       login: user.login,
