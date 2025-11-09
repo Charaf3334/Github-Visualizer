@@ -145,8 +145,8 @@ const Home = () => {
               <p className="text-sm">Please enter your username.</p>
             </div>
           )}
-          <div className='flex flex-col w-full gap-x-7 md:w-[120%] md:flex-row'>
-          <div className="mt-10 w-full max-w-md bg-transparent rounded-xl p-4 backdrop-blur-xs border-3 border-white/10">
+          <div className='flex flex-col w-full gap-x-7 md:w-[120%] md:flex-row items-center'>
+            <div className="mt-10 w-full max-w-md bg-transparent rounded-xl p-4 backdrop-blur-xs border-3 border-white/10">
               <h2 className="text-white text-lg font-semibold mb-3">Recently searched users</h2>
               <ul className="space-y-2">
                 {users.map((u, i) => (
@@ -175,7 +175,7 @@ const Home = () => {
                 ))}
               </ul>
             </div>  
-          <div className="mt-10 mb-20 w-full max-w-md bg-transparent rounded-xl p-4 backdrop-blur-xs border-3 border-white/10">
+            <div className="mt-10 mb-20 w-full max-w-md bg-transparent rounded-xl p-4 backdrop-blur-xs border-3 border-white/10">
               <h2 className="text-white text-lg font-semibold mb-3">Most loved languages</h2>
               <ul className="space-y-2">
                 {language.map((language, i) => (

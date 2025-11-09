@@ -11,12 +11,12 @@ const Navbar = () => {
           Git Visualizer
         </Link>
       </span>
-      <button
-        onClick={() => window.open('https://github.com/Charaf3334/Github-Visualizer', '_blank')}
-        className="flex items-center gap-2 md:text-lg text-sm border rounded-xl px-5 py-2 text-white border-white/30 hover:bg-yellow-500/20 transition-all duration-300 cursor-pointer">
+      <a
+        className="flex items-center gap-2 md:text-lg text-sm border rounded-xl px-5 py-2 text-white border-white/30 hover:bg-yellow-500/20 transition-all duration-300 cursor-pointer"
+        href='https://github.com/Charaf3334/Github-Visualizer' target='_blank' rel='noopener noreferrer'>
         <Star className="w-5 h-5 text-yellow-400" />
-        Give a Star
-      </button>
+          Give a Star
+      </a>
     </nav>
   )
 }

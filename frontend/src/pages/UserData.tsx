@@ -214,7 +214,7 @@ const UserData = () => {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="block bg-white/5 p-4 rounded-xl border border-white/10 hover:bg-white/6">
-                    <h3 className="text-lg font-semibold text-blue-400 mb-2">{repo.name}</h3>
+                    <h3 className="text-lg font-semibold text-blue-400 mb-2 line-clamp-2">{repo.name}</h3>
                     {repo.description && <p className="text-gray-300 text-sm mb-3 line-clamp-2">{repo.description}</p>}
                     <div className="flex flex-wrap gap-4 text-sm text-gray-400">
                       <div className="flex items-center gap-1"><Star size={16} className="text-yellow-400" /> {repo.stargazers_count}</div>
