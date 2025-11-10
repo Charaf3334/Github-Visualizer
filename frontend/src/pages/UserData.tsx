@@ -51,7 +51,38 @@ const UserData = () => {
   const [showList, setShowList] = useState<null | 'followers' | 'following'>(null)
   const [listUsers, setListUsers] = useState<User[]>([])
   const [loadingList, setLoadingList] = useState(false)
-  const COLORS = ['#e91e63', '#9c27b0', '#ff9800', '#4caf50', '#f44336', '#2196f3', '#ffc107', '#00bcd4']
+
+  const languageColors: Record<string, string> = {
+    'ASP.NET': '#9400ff',
+    Assembly: '#6E4C13',
+    C: '#555555',
+    'C++': '#f34b7d',
+    'C#': '#178600',
+    CSS: '#663399',
+    Dart: '#00B4AB',
+    Dockerfile: '#384d54',
+    Go: '#00ADD8',
+    HTML: '#e34c26',
+    Java: '#b07219',
+    JavaScript: '#f1e05a',
+    'Jupyter Notebook': '#DA5B0B',
+    Kotlin: '#A97BFF',
+    Lua: '#000080',
+    Makefile: '#427819',
+    'Objective-C': '#438eff',
+    PHP: '#4F5D95',
+    Python: '#3572A5',
+    R: '#198CE7',
+    Ruby: '#701516',
+    Rust: '#701516',
+    Sass: '#a53b70',
+    Scala: '#c22d40',
+    SCSS: '#c6538c',
+    Shell: '#89e051',
+    Swift: '#F05138',
+    TypeScript: '#3178c6',
+    Vue: '#41b883'
+  }
 
   useEffect(() => {
     if (!login) 
@@ -191,7 +222,7 @@ const UserData = () => {
                         return [`${lang?.percentage.toFixed(1)}%`, 'Percentage']
                     }}/>
                     <Bar dataKey="value" radius={[4, 4, 4, 4]} isAnimationActive={false} cursor="default">
-                      {displayedLangs.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
+                      {displayedLangs.map((l, i) => <Cell key={i} fill={`${languageColors[l.name] || '#9c27b0'}`} />)}
                     </Bar>
                   </BarChart>
                 </ResponsiveContainer>
