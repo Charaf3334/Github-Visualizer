@@ -53,7 +53,7 @@ const Home = () => {
         console.log(err)
       }
       setWait(true)
-    }, 1000)
+    }, 500)
     return () => clearTimeout(timer)
   }, [])
 

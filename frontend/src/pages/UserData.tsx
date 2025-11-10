@@ -81,7 +81,8 @@ const UserData = () => {
     Shell: '#89e051',
     Swift: '#F05138',
     TypeScript: '#3178c6',
-    Vue: '#41b883'
+    Vue: '#41b883',
+    Perl: '#0298c3'
   }
 
   useEffect(() => {

@@ -3,6 +3,7 @@ import axios from 'axios'
 import dotenv from 'dotenv'
 import cors from 'cors'
 import pkg from 'pg'
+import { rateLimit } from 'express-rate-limit'
 
 dotenv.config()
 
@@ -30,6 +31,10 @@ app.use((req, res, next) => {
     return res.status(403).json({error: 'Forbidden'})
   next()
 })
+
+if (process.env.MODE === 'production')
+  app.use(rateLimit({windowMs: 60 * 1000, max:100}))
+
 
 const tokens = [process.env.GITHUB_TOKEN1, process.env.GITHUB_TOKEN2, process.env.GITHUB_TOKEN3]
 let currentTokenIndex = 0
