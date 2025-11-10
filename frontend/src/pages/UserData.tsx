@@ -7,6 +7,7 @@ import NotFound from './NotFound'
 import UserList from '../components/UserList'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, CartesianGrid } from 'recharts'
 import {Star, GitFork, Eye} from 'lucide-react'
+import { motion } from 'motion/react'
 
 interface Repo 
 {
@@ -166,8 +167,9 @@ const UserData = () => {
   return (
     <div className="min-h-screen text-white lora-regular">
       <Navbar />
-      <div className="max-w-6xl mx-auto px-4 py-10 mt-6">
-        <div className="bg-linear-to-br from-gray-500/10 to-purple-500/2 backdrop-blur-sm border border-white/10 p-8 rounded-2xl shadow-2xl mb-8 flex flex-col md:flex-row items-center gap-6">
+      <motion.div className="max-w-6xl mx-auto px-4 py-10 mt-6">
+        <motion.div className="bg-linear-to-br from-gray-500/10 to-purple-500/2 backdrop-blur-sm border border-white/10 p-8 rounded-2xl shadow-2xl mb-8 flex flex-col md:flex-row items-center gap-6"
+          initial={{opacity:0, y:0}} animate={{opacity:1, y:0}} transition={{duration: 0.7}}>
           <img src={user.avatar_url} alt={user.login} className="w-32 h-32 rounded-full border-4 border-white/20 shadow-lg" />
           <div className="flex-1 text-center md:text-left relative w-full">
             <div className="md:absolute md:top-0 md:right-0 mt-4 md:mt-0">
@@ -200,9 +202,10 @@ const UserData = () => {
               <div><span className="text-1xl font-bold text-white">{user.public_repos}</span> {user.public_repos == 1 ? "Repository" : "Repositories"}</div>
             </div>
           </div>
-        </div>
+        </motion.div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div className="bg-white/5 backdrop-blur-sm border border-white/10 p-6 rounded-2xl shadow-xl">
+          <motion.div className="bg-white/5 backdrop-blur-sm border border-white/10 p-6 rounded-2xl shadow-xl"
+            initial={{opacity:0, y:0}} animate={{opacity:1, y:0}} transition={{duration: 1}}>
             <h2 className="text-2xl font-bold mb-6 text-center md:text-left">Languages</h2>
             {displayedLangs.length 
             ? (
@@ -230,8 +233,9 @@ const UserData = () => {
               </div>
            ) 
            : <p className="text-gray-400 text-center py-12">No language data available</p>}
-          </div>
-          <div className="bg-white/5 backdrop-blur-sm border border-white/10 p-6 rounded-2xl shadow-xl">
+          </motion.div>
+          <motion.div className="bg-white/5 backdrop-blur-sm border border-white/10 p-6 rounded-2xl shadow-xl"
+            initial={{opacity:0, y:0}} animate={{opacity:1, y:0}} transition={{duration: 1.2}}>
             <div className='flex flex-col md:flex-row text-center justify-between'>
               <h2 className="text-2xl font-bold mb-3 md:mb-6">Top Repositories</h2>
               <span className='lora-bold text-sm md:mt-2 mb-3'>Total stars: <span className='text-yellow-400'>{user.all_stars}</span></span>
@@ -271,9 +275,9 @@ const UserData = () => {
               </div>
             ) 
             : <p className="text-gray-400 text-center py-12">No repositories found</p>}
-          </div>
+          </motion.div>
         </div>
-      </div>
+      </motion.div>
       {showList && (
         <UserList
           title={showList === 'followers' ? 'Followers' : 'Following'}

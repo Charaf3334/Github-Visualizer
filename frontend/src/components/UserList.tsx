@@ -1,5 +1,6 @@
 import { X, Loader2 } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { motion } from 'motion/react'
 
 interface MiniUser 
 {
@@ -46,7 +47,8 @@ const UserList = ({title, users, onClose, onSelect, loading = false}: UserListPr
           <div className="space-y-3">
             {users.map((u) => (
               <Link to={`/user/${u.login}`} className='flex '>
-                <button
+                <motion.button
+                  initial={{opacity:0, y:0}} animate={{opacity:1, y:0}} transition={{duration: 1}}
                   key={u.login}
                   onClick={() => onSelect(u.login)}
                   className="flex cursor-pointer items-center gap-4 w-full p-3 rounded-xl transition bg-[#1a1a1a] hover:bg-[#242424] border border-transparent hover:border-gray-700 text-left">
@@ -58,7 +60,7 @@ const UserList = ({title, users, onClose, onSelect, loading = false}: UserListPr
                     <span className="font-semibold text-white">{u.login.length > 32 ? u.login.slice(0, 30) + '...' : u.login}</span>
                     <p className="text-xs text-gray-400 lora-italic">@{u.login}</p>
                   </div>
-                </button>
+                </motion.button>
               </Link>
             ))}
           </div>

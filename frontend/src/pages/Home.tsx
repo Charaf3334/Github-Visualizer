@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react'
 import axios from 'axios'
 import { useNavigate, Link } from 'react-router-dom'
 import { Loader2 } from 'lucide-react'
+import { motion } from 'motion/react'
 
 interface User
 {
@@ -100,13 +101,14 @@ const Home = () => {
       ) 
       : (
         <>
-          <h1 className="text-white text-[42px] md:text-6xl font-bold leading-tight mt-25 md:mt-0">
+          <motion.h1 className="text-white text-[42px] md:text-6xl font-bold leading-tight mt-25 md:mt-0" initial={{opacity:0, y:30}} animate={{opacity:1, y:0}} transition={{duration: 0.7}}>
             Visualize Your <br/> Github Account
-          </h1>
-          <p className="text-gray-400 text-[15px] md:text-xl mt-2">
+          </motion.h1>
+          <motion.p className="text-gray-400 text-[15px] md:text-xl mt-2" initial={{opacity:0, y:30}} animate={{opacity:1, y:0}} transition={{duration: 0.7}}>
             Your developer journey in one view. 
-          </p>
-          <div className={`flex w-full mt-8 md:mt-15 border-2 ${isEmpty || notFound ? 'border-red-500' : 'border-white/30'} rounded-xl overflow-hidden hover:shadow-xl transition-shadow duration-300 shadow-2xl`}>
+          </motion.p>
+          <motion.div className={`flex w-full mt-8 md:mt-15 border-2 ${isEmpty || notFound ? 'border-red-500' : 'border-white/30'} rounded-xl overflow-hidden hover:shadow-xl transition-shadow duration-300 shadow-2xl`}
+            initial={{opacity:0, y:30}} animate={{opacity:1, y:0}} transition={{duration: 0.7}}>
             <input
               type="text"
               value={username}
@@ -128,7 +130,7 @@ const Home = () => {
                   <i className="bx bx-search text-white text-sm md:text-xl"></i>
                 )}
               </button>
-          </div>
+          </motion.div>
           {notFound && (
             <div className="flex items-center gap-2 text-red-500 mt-2">
               <div className='hidden md:flex'>
@@ -146,11 +148,13 @@ const Home = () => {
             </div>
           )}
           <div className='flex flex-col w-full gap-x-7 md:w-[120%] md:flex-row items-center'>
-            <div className="mt-10 w-full max-w-md bg-transparent rounded-xl p-4 backdrop-blur-xs border-3 border-white/10">
+            <motion.div className="mt-10 w-full max-w-md bg-transparent rounded-xl p-4 backdrop-blur-xs border-3 border-white/10"
+              initial={{opacity:0, y:30}} animate={{opacity:1, y:0}} transition={{duration: 0.7}}>
               <h2 className="text-white text-lg font-semibold mb-3">Recently searched users</h2>
               <ul className="space-y-2">
                 {users.map((u, i) => (
-                  <li
+                  <motion.li
+                    initial={{opacity:0, y:30}} animate={{opacity:1, y:0}} transition={{duration: 1}}
                     key={i}
                     className="flex justify-between items-center px-3 py-2 bg-white/5 rounded-lg hover:bg-white/15 transition-colors duration-300 cursor-pointer">
                     <Link
@@ -171,15 +175,17 @@ const Home = () => {
                       </div>
                       <span className="text-gray-400 text-sm">#{i + 1}</span>
                     </Link>
-                  </li>
+                  </motion.li>
                 ))}
               </ul>
-            </div>  
-            <div className="mt-10 mb-20 w-full max-w-md bg-transparent rounded-xl p-4 backdrop-blur-xs border-3 border-white/10">
+            </motion.div>  
+            <motion.div className="mt-10 mb-20 w-full max-w-md bg-transparent rounded-xl p-4 backdrop-blur-xs border-3 border-white/10"
+              initial={{opacity:0, y:30}} animate={{opacity:1, y:0}} transition={{duration: 0.7}}>
               <h2 className="text-white text-lg font-semibold mb-3">Most loved languages</h2>
               <ul className="space-y-2">
                 {language.map((language, i) => (
-                  <li
+                  <motion.li
+                    initial={{opacity:0, y:30}} animate={{opacity:1, y:0}} transition={{duration: 1}}
                     key={i}
                     className="flex justify-between items-center px-3 py-2 bg-white/5 rounded-lg hover:bg-white/15 transition-colors duration-300 cursor-pointer">
                       <div className="flex items-center gap-2">
@@ -198,10 +204,10 @@ const Home = () => {
                         </div>
                       </div>
                       <span className="text-gray-400 text-sm">{language.percentage} %</span>
-                  </li>
+                  </motion.li>
                 ))}
               </ul>
-            </div>  
+            </motion.div>  
           </div>
         </>
       )}
