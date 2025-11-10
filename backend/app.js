@@ -8,7 +8,7 @@ import { rateLimit } from 'express-rate-limit'
 dotenv.config()
 
 const app = express()
-app.use(cors({origin: process.env.FRONT_URL}))
+app.use(cors({origin: process.env.FRONT_URL, credentials: true}))
 app.use(express.json())
 
 const port = process.env.PORT
