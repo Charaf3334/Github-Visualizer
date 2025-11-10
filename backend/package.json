@@ -1,15 +1,12 @@
 {
   "name": "hh",
   "version": "1.0.0",
-  "main": "index.js",
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "server": "node --watch app.js"
+    "server": "node --watch app.js",
+    "start": "node app.js"
   },
-  "author": "",
-  "license": "ISC",
-  "description": "",
   "dependencies": {
     "axios": "^1.13.1",
     "cors": "^2.8.5",
@@ -18,5 +15,8 @@
     "express-rate-limit": "^8.2.1",
     "pg": "^8.16.3",
     "sqlite3": "^5.1.7"
+  },
+  "engines": {
+    "node": "20.x"
   }
 }
