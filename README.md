@@ -1,16 +1,17 @@
 # Git Visualizer
 
-As a developer, mastering GitHub is essential. Git Visualizer lets you explore your GitHub profile visually, displaying your most-used programming languages and most popular repositories. You can also view your followers and following profiles to explore their stats in the same way.
+As a developer, mastering Github is essential. Git Visualizer lets you explore your Github profile visually, displaying your most-used programming languages and most popular repositories. You can also view your followers and following profiles to explore their stats in the same way.
 
 # Preview
 
+*Home Page*
 ![Home Page Preview](./preview/preview1.png)
 
+*User Page*
 ![User Page Preview](./preview/preview2.png)
 
+*Followers List*
 ![Followers Preview](./preview/preview3.png)
-
-![Linus Torvald Page Preview](./preview/preview4.png)
 
 
 # Stack
