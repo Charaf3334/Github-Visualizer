@@ -1,3 +1,6 @@
+# Browse
+[Visit the website](https://git-visualizer.netlify.app/home)
+
 # Git Visualizer
 
 As a developer, mastering Github is essential. Git Visualizer lets you explore your Github profile visually, displaying your most-used programming languages and most popular repositories. You can also view your followers and following profiles to explore their stats in the same way.
