@@ -147,7 +147,7 @@ const Home = () => {
               <p className="text-sm">Please enter your username.</p>
             </div>
           )}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full mt-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full mt-8 justify-items-center">
             <motion.div className="mt-10 w-full max-w-md bg-transparent rounded-xl p-4 backdrop-blur-xs border-3 border-white/10"
               initial={{opacity:0, y:30}} animate={{opacity:1, y:0}} transition={{duration: 0.7}}>
               <h2 className="text-white text-lg font-semibold mb-3">Recently searched users</h2>
