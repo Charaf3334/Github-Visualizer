@@ -90,9 +90,9 @@ const Home = () => {
   }
 
   return (
-  <div className="relative min-h-screen">
+  <div className="min-h-screen">
     <Navbar />
-    <div className="lora-regular flex flex-col items-center justify-center text-center absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 px-4 w-full max-w-2xl mt-55 md:mt-0">
+    <div className="lora-regular flex flex-col items-center justify-center text-center px-5 py-16 md:py-0 w-full max-w-3xl mx-auto">
       {!wait 
       ? (
         <div className="flex justify-center mt-20">
@@ -101,7 +101,7 @@ const Home = () => {
       ) 
       : (
         <>
-          <motion.h1 className="text-white text-[42px] md:text-6xl font-bold leading-tight mt-25 md:mt-0" initial={{opacity:0, y:30}} animate={{opacity:1, y:0}} transition={{duration: 0.7}}>
+          <motion.h1 className="text-white text-[42px] md:text-6xl font-bold leading-tight" initial={{opacity:0, y:30}} animate={{opacity:1, y:0}} transition={{duration: 0.7}}>
             Visualize Your <br/> Github Account
           </motion.h1>
           <motion.p className="text-gray-400 text-[15px] md:text-xl mt-2" initial={{opacity:0, y:30}} animate={{opacity:1, y:0}} transition={{duration: 0.7}}>
@@ -147,7 +147,7 @@ const Home = () => {
               <p className="text-sm">Please enter your username.</p>
             </div>
           )}
-          <div className='flex flex-col w-full gap-x-7 md:w-[120%] md:flex-row items-center'>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full mt-8">
             <motion.div className="mt-10 w-full max-w-md bg-transparent rounded-xl p-4 backdrop-blur-xs border-3 border-white/10"
               initial={{opacity:0, y:30}} animate={{opacity:1, y:0}} transition={{duration: 0.7}}>
               <h2 className="text-white text-lg font-semibold mb-3">Recently searched users</h2>
