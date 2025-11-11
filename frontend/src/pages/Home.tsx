@@ -68,7 +68,6 @@ const Home = () => {
     setLoading(true)
     try 
     {
-      await new Promise(res => setTimeout(res, 1000))
       const {data} = await axios.get(`${import.meta.env.VITE_BACK_URL}/users`, {
         params: {username},
         headers: {'api-key': import.meta.env.VITE_API_KEY}
