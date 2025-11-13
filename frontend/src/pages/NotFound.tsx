@@ -7,9 +7,9 @@ const NotFound = () => {
   const navigate = useNavigate()
 
   return (
-    <div className="relative min-h-screen">
+    <div className="min-h-screen flex flex-col">
       <Navbar />
-      <motion.div className="lora-regular flex flex-col items-center justify-center text-center absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 gap-6"
+      <motion.div className="lora-regular flex-1 flex flex-col items-center justify-center text-center gap-6 p-10 md:p-0"
         initial={{opacity:0, y:50}} animate={{opacity:1, y:0}} transition={{duration: 0.5}}>
         <h1 className="text-5xl md:text-6xl text-white lora-bold">404</h1>
         <p className="text-white text-lg md:text-xl">Are you lost? This page got deleted or it does not exist.</p>
