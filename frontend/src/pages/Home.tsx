@@ -20,6 +20,7 @@ interface LanguageOccur
 
 const Home = () => {
   const [usernameState, setUsername] = useState('')
+  const navigate = useNavigate()
   const [isEmpty, setIsEmpty] = useState(false)
   const [notFound, setNotFound] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -27,10 +28,10 @@ const Home = () => {
   const buttonRef = useRef<HTMLButtonElement>(null)
   const [users, setUsers] = useState<User[]>([])
   const [language, setLanguage] = useState<LanguageOccur[]>([])
-  const navigate = useNavigate()
   const [searchResults, setSearchResults] = useState<User[]>([])
   const [isSearching, setIsSearching] = useState(false)
   const searchTimeoutRef = useRef<number | null>(null)
+  const searchResultsRef = useRef<HTMLDivElement>(null)
 
   const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
@@ -51,6 +52,18 @@ const Home = () => {
     }
   }, [])
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchResultsRef.current && !searchResultsRef.current.contains(event.target as Node))
+        setSearchResults([])
+    }
+    if (searchResults.length > 0)
+      document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [searchResults])
+
   const searchUsers = async (query: string) => {
     query = query.trim().toLowerCase()
     if (!query) 
@@ -65,9 +78,7 @@ const Home = () => {
       const users: User[] = data.map((user: User) => ({
           username: user.username,
           avatar: user.avatar,
-          score: user.username.toLowerCase() === query ? 2 : 
-                user.username.toLowerCase().startsWith(query) ? 1 : 0
-        })).sort((a: User, b: User) => b.score - a.score).slice(0, 4).map(({ username, avatar }: User) => ({ username, avatar }))
+          score: user.username.toLowerCase() === query ? 2 : user.username.toLowerCase().startsWith(query) ? 1 : 0})).sort((a: User, b: User) => b.score - a.score).slice(0, 5).map(({username, avatar}: User) => ({username, avatar}))
       setSearchResults(users)
     } 
     catch (error: unknown) 
@@ -176,7 +187,7 @@ const Home = () => {
               placeholder="Enter your Github username"
               className={`flex-1 px-5 py-3 text-white text-sm md:text-lg placeholder:text-gray-400 outline-none bg-transparent border-t-2 border-l-2 border-b-2 ${isEmpty || notFound ? 'border-red-500' : 'border-white/30'} ${searchResults.length > 0 ? 'rounded-tl-xl' : 'rounded-l-xl'}`}/>
             <button 
-              className={`px-5 py-3 bg-white/30 border-2 hover:bg-white/35 transition-colors duration-300 text-white flex items-center justify-center cursor-pointer ${isEmpty || notFound ? 'border-red-500' : 'border-white/30'} ${searchResults.length > 0 ? 'rounded-tr-xl' : 'rounded-r-xl'}`}
+              className={`px-5 py-3 bg-white/30 border-2 hover:bg-white/35 transition-colors duration-300 text-white flex items-center justify-center cursor-pointer ${isEmpty || notFound ? 'border-red-500' : 'border-white/15'} ${searchResults.length > 0 ? 'rounded-tr-xl' : 'rounded-r-xl'}`}
               onClick={() => handleSearch(usernameState)}
               ref={buttonRef}
               disabled={loading || isSearching}>
@@ -188,8 +199,9 @@ const Home = () => {
             </button>
             {searchResults.length > 0 && (
               <motion.div 
-                className="absolute left-0 top-full w-full backdrop-blur-sm z-20 border-2 border-white/30 border-t-0 rounded-b-xl shadow-2xl">
-                <ul className="bg-black/80 rounded-b-xl">
+                className="absolute left-0 top-full w-full backdrop-blur-2xl z-20 border-2 border-white/30 border-t-0 rounded-b-xl shadow-2xl"
+                ref={searchResultsRef}>
+                <ul className="bg-transparent rounded-b-xl">
                   {searchResults.map((user, index) => {
                     return ((
                     <motion.li
@@ -211,8 +223,8 @@ const Home = () => {
                             e.currentTarget.onerror = null
                           }}/>
                         <div className="flex-1">
-                          <div className="text-white font-medium">{user.username}</div>
-                          <div className="text-gray-400 text-sm">@{user.username}</div>
+                          <div className="text-white text-sm md:text-lg">{user.username}</div>
+                          <div className="text-gray-400 text-xs md:text-sm">@{user.username}</div>
                         </div>
                       </button>
                     </motion.li>

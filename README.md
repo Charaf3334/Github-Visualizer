@@ -1,5 +1,5 @@
 # Browse
-<a href="https://git-visualizer.netlify.app/home" target="_blank">Visit the website</a>
+<a href="https://gitvisualizeer.netlify.app/" target="_blank">Visit the website</a>
 
 # Git Visualizer
 
