@@ -178,7 +178,8 @@ const Home = () => {
           <motion.p className="text-gray-400 text-[15px] md:text-xl mt-2" initial={{opacity:0, y:30}} animate={{opacity:1, y:0}} transition={{duration: 0.7}}>
             Your developer journey in one view. 
           </motion.p>
-          <motion.div className={`flex w-full mt-8 md:mt-15 relative hover:shadow-xl transition-shadow duration-300 shadow-2xl`}>
+          <motion.div className={`flex w-full mt-8 md:mt-15 relative hover:shadow-xl transition-shadow duration-300 shadow-2xl`}
+            initial={{opacity:0, y:30}} animate={{opacity:1, y:0}} transition={{duration: 0.7}}>
             <input
               type="text"
               value={usernameState}
@@ -203,7 +204,8 @@ const Home = () => {
             </button>
 
             {searchResults.length > 0 && (
-              <div className="absolute left-0 top-full w-full backdrop-blur-sm z-20 border-2 border-white/30 border-t-0 rounded-b-xl shadow-2xl">
+              <motion.div 
+                className="absolute left-0 top-full w-full backdrop-blur-sm z-20 border-2 border-white/30 border-t-0 rounded-b-xl shadow-2xl">
                 <ul className="bg-black/80 rounded-b-xl">
                   {searchResults.map((user, index) => {
                     return (
@@ -236,7 +238,7 @@ const Home = () => {
                     </motion.li>
                   )})}
                 </ul>
-              </div>
+              </motion.div>
             )}
           </motion.div>
           {notFound && (
