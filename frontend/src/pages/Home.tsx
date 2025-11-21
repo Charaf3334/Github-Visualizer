@@ -1,25 +1,23 @@
 import Navbar from '../components/Navbar'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import axios from 'axios'
 import { useNavigate, Link } from 'react-router-dom'
 import { Loader2 } from 'lucide-react'
 import { motion } from 'motion/react'
 
-interface User
-{
+interface User {
   username: string,
-  avatar: string
+  avatar: string,
+  score: number
 }
 
-interface LanguageOccur
-{
+interface LanguageOccur {
   lang: string,
   percentage: number
 }
 
 const Home = () => {
-
-  const [username, setUsername] = useState('')
+  const [usernameState, setUsername] = useState('')
   const [isEmpty, setIsEmpty] = useState(false)
   const [notFound, setNotFound] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -28,13 +26,84 @@ const Home = () => {
   const [users, setUsers] = useState<User[]>([])
   const [language, setLanguage] = useState<LanguageOccur[]>([])
   const navigate = useNavigate()
+  
+  const [searchResults, setSearchResults] = useState<User[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const searchTimeoutRef = useRef<number | null>(null);
 
-  const onchangeHandle = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setUsername(e.target.value)
-    setIsEmpty(false)
-    setNotFound(false)
-  }
+  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setUsername(value);
+    setIsEmpty(false);
+    setNotFound(false);
 
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    if (value.trim().length >= 3) {
+      setIsSearching(true);
+      searchTimeoutRef.current = setTimeout(async () => {
+        await searchUsers(value);
+      }, 300);
+    } else {
+      setSearchResults([]);
+      setIsSearching(false);
+    }
+  }, []);
+
+  const searchUsers = async (query: string) => {
+    query = query.trim().toLowerCase();
+    if (!query) {
+      setSearchResults([]);
+      setIsSearching(false);
+      return;
+    }
+
+    try {
+      const { data } = await axios.get(
+        `${import.meta.env.VITE_BACK_URL}/search/users`,
+        {
+          params: { q: query },
+          headers: { 'api-key': import.meta.env.VITE_API_KEY }
+        }
+      );
+
+      const users: User[] = data
+        .map((user: User) => ({
+          username: user.username,
+          avatar: user.avatar,
+          score: user.username.toLowerCase() === query ? 2 : 
+                user.username.toLowerCase().startsWith(query) ? 1 : 0
+        }))
+        .sort((a: User, b: User) => b.score - a.score)
+        .slice(0, 4)
+        .map(({ username, avatar }: User) => ({ username, avatar }));
+      
+      setSearchResults(users);
+    } catch (error: unknown) {
+      setSearchResults([]);
+      console.log(error)
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const handleUserSelect = (selectedUsername: string) => {
+    console.log("Selected user:", selectedUsername);
+    setUsername(selectedUsername);
+    setSearchResults([]);
+    handleSearch(selectedUsername);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, []);
+  
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter')
       buttonRef.current?.click()
@@ -42,48 +111,51 @@ const Home = () => {
   
   useEffect(() => {
     const timer = setTimeout(async () => {
-      try
-      {
-        const {data} = await axios.get(`${import.meta.env.VITE_BACK_URL}/history`, {headers: {'api-key': import.meta.env.VITE_API_KEY}})
+      try {
+        const {data} = await axios.get(`${import.meta.env.VITE_BACK_URL}/history`, {
+          headers: {'api-key': import.meta.env.VITE_API_KEY}
+        })
         setUsers(data)
-        const res = await axios.get(`${import.meta.env.VITE_BACK_URL}/occurences`, {headers: {'api-key': import.meta.env.VITE_API_KEY}})
+        const res = await axios.get(`${import.meta.env.VITE_BACK_URL}/occurences`, {
+          headers: {'api-key': import.meta.env.VITE_API_KEY}
+        })
         setLanguage(res.data)
-      }
-      catch (err: unknown)
-      {
-        console.log(err)
+      } catch (err: unknown) {
+        console.error(err)
       }
       setWait(true)
-    }, 500)
+    }, 0)
     return () => clearTimeout(timer)
   }, [])
 
-  const handleSearch = async () => {
-    if (username.trim() === '') 
-    {
+  const handleSearch = async (selectedUsername?: string) => {
+    const usernameToSearch = selectedUsername || usernameState;
+    console.log("fire");
+    
+
+    if (notFound)
+      return;
+    if (usernameToSearch.trim() === '') {
       setIsEmpty(true)
       return 
     }
+    
     setIsEmpty(false)
     setLoading(true)
-    try 
-    {
+    
+    try {
       const {data} = await axios.get(`${import.meta.env.VITE_BACK_URL}/users`, {
-        params: {username},
+        params: { username: usernameToSearch },
         headers: {'api-key': import.meta.env.VITE_API_KEY}
       })
       setNotFound(false)
       navigate(`/user/${data.login}`)
-    }
-    catch (err: unknown) 
-    {
+    } catch (err: unknown) {
       if (axios.isAxiosError(err) && err.status === 404)
         setNotFound(true)
       else
-        console.log(err)
-    }
-    finally 
-    {
+        console.error(err)
+    } finally {
       setLoading(false)
     }
   }
@@ -106,29 +178,66 @@ const Home = () => {
           <motion.p className="text-gray-400 text-[15px] md:text-xl mt-2" initial={{opacity:0, y:30}} animate={{opacity:1, y:0}} transition={{duration: 0.7}}>
             Your developer journey in one view. 
           </motion.p>
-          <motion.div className={`flex w-full mt-8 md:mt-15 border-2 ${isEmpty || notFound ? 'border-red-500' : 'border-white/30'} rounded-xl overflow-hidden hover:shadow-xl transition-shadow duration-300 shadow-2xl`}
-            initial={{opacity:0, y:30}} animate={{opacity:1, y:0}} transition={{duration: 0.7}}>
+          <motion.div className={`flex w-full mt-8 md:mt-15 relative hover:shadow-xl transition-shadow duration-300 shadow-2xl`}>
             <input
               type="text"
-              value={username}
-              onChange={onchangeHandle}
+              value={usernameState}
+              onChange={handleSearchChange}
               onKeyDown={handleKeyDown}
               tabIndex={0}
               placeholder="Enter your Github username"
-              className="flex-1 px-5 py-3 text-white text-sm md:text-lg placeholder:text-gray-400 outline-none bg-transparent"/>
-              <button 
-                className="px-5 py-3 bg-white/30 hover:bg-white/35 transition-colors duration-300 text-white flex items-center justify-center cursor-pointer"
-                onClick={handleSearch}
-                ref={buttonRef}
-                disabled={loading}>
-                {loading 
-                ? (
-                  <Loader2 className="animate-spin h-4 w-4 md:h-5 md:w-5 text-white" />
-                ) 
-                : (
-                  <i className="bx bx-search text-white text-sm md:text-xl"></i>
-                )}
-              </button>
+              className={`flex-1 px-5 py-3 text-white text-sm md:text-lg placeholder:text-gray-400 outline-none bg-transparent border-t-2 border-l-2 border-b-2 ${isEmpty || notFound ? 'border-red-500' : 'border-white/30'} ${searchResults.length > 0 ? 'rounded-tl-xl' : 'rounded-l-xl'}`}
+            />
+            
+            <button 
+              className={`px-5 py-3 bg-white/30 border-2 hover:bg-white/35 transition-colors duration-300 text-white flex items-center justify-center cursor-pointer ${isEmpty || notFound ? 'border-red-500' : 'border-white/30'} ${searchResults.length > 0 ? 'rounded-tr-xl' : 'rounded-r-xl'}`}
+              onClick={() => handleSearch(usernameState)}
+              ref={buttonRef}
+              disabled={loading || isSearching}
+            >
+              {loading || isSearching ? (
+                <Loader2 className="animate-spin h-4 w-4 md:h-5 md:w-5 text-white" />
+              ) : (
+                <i className="bx bx-search text-white text-sm md:text-xl"></i>
+              )}
+            </button>
+
+            {searchResults.length > 0 && (
+              <div className="absolute left-0 top-full w-full backdrop-blur-sm z-20 border-2 border-white/30 border-t-0 rounded-b-xl shadow-2xl">
+                <ul className="bg-black/80 rounded-b-xl">
+                  {searchResults.map((user, index) => {
+                    return (
+                    <motion.li
+                      key={user.username + "-" + index}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.2, delay: index * 0.1 }}
+                      className="border-b border-white/10 last:border-b-0"
+                    >
+                      <button
+                        type="button"
+                        onClick={() => handleUserSelect(user.username)}
+                        className="cursor-pointer flex items-center gap-3 w-full px-4 py-3 hover:bg-white/10 transition-colors duration-200 text-left"
+                      >
+                        <img
+                          src={user.avatar}
+                          alt={user.username}
+                          className="w-8 h-8 rounded-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.src = '/default-avatar.png';
+                            e.currentTarget.onerror = null;
+                          }}
+                        />
+                        <div className="flex-1">
+                          <div className="text-white font-medium">{user.username}</div>
+                          <div className="text-gray-400 text-sm">@{user.username}</div>
+                        </div>
+                      </button>
+                    </motion.li>
+                  )})}
+                </ul>
+              </div>
+            )}
           </motion.div>
           {notFound && (
             <div className="flex items-center gap-2 text-red-500 mt-2">
