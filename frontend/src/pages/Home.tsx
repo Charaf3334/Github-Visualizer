@@ -5,13 +5,15 @@ import { useNavigate, Link } from 'react-router-dom'
 import { Loader2 } from 'lucide-react'
 import { motion } from 'motion/react'
 
-interface User {
+interface User 
+{
   username: string,
   avatar: string,
   score: number
 }
 
-interface LanguageOccur {
+interface LanguageOccur 
+{
   lang: string,
   percentage: number
 }
@@ -26,83 +28,71 @@ const Home = () => {
   const [users, setUsers] = useState<User[]>([])
   const [language, setLanguage] = useState<LanguageOccur[]>([])
   const navigate = useNavigate()
-  
-  const [searchResults, setSearchResults] = useState<User[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
-  const searchTimeoutRef = useRef<number | null>(null);
+  const [searchResults, setSearchResults] = useState<User[]>([])
+  const [isSearching, setIsSearching] = useState(false)
+  const searchTimeoutRef = useRef<number | null>(null)
 
   const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setUsername(value);
-    setIsEmpty(false);
-    setNotFound(false);
-
-    if (searchTimeoutRef.current) {
-      clearTimeout(searchTimeoutRef.current);
+    const value = e.target.value
+    setUsername(value)
+    setIsEmpty(false)
+    setNotFound(false)
+    if (searchTimeoutRef.current)
+      clearTimeout(searchTimeoutRef.current)
+    if (value.trim().length >= 3) 
+    {
+      setIsSearching(true)
+      searchTimeoutRef.current = setTimeout(async () => await searchUsers(value), 300)
+    } 
+    else 
+    {
+      setSearchResults([])
+      setIsSearching(false)
     }
-
-    if (value.trim().length >= 3) {
-      setIsSearching(true);
-      searchTimeoutRef.current = setTimeout(async () => {
-        await searchUsers(value);
-      }, 300);
-    } else {
-      setSearchResults([]);
-      setIsSearching(false);
-    }
-  }, []);
+  }, [])
 
   const searchUsers = async (query: string) => {
-    query = query.trim().toLowerCase();
-    if (!query) {
-      setSearchResults([]);
-      setIsSearching(false);
-      return;
+    query = query.trim().toLowerCase()
+    if (!query) 
+    {
+      setSearchResults([])
+      setIsSearching(false)
+      return
     }
-
-    try {
-      const { data } = await axios.get(
-        `${import.meta.env.VITE_BACK_URL}/search/users`,
-        {
-          params: { q: query },
-          headers: { 'api-key': import.meta.env.VITE_API_KEY }
-        }
-      );
-
-      const users: User[] = data
-        .map((user: User) => ({
+    try 
+    {
+      const {data} = await axios.get(`${import.meta.env.VITE_BACK_URL}/search/users`, {params: {q: query}, headers: {'api-key': import.meta.env.VITE_API_KEY}})
+      const users: User[] = data.map((user: User) => ({
           username: user.username,
           avatar: user.avatar,
           score: user.username.toLowerCase() === query ? 2 : 
                 user.username.toLowerCase().startsWith(query) ? 1 : 0
-        }))
-        .sort((a: User, b: User) => b.score - a.score)
-        .slice(0, 4)
-        .map(({ username, avatar }: User) => ({ username, avatar }));
-      
-      setSearchResults(users);
-    } catch (error: unknown) {
-      setSearchResults([]);
+        })).sort((a: User, b: User) => b.score - a.score).slice(0, 4).map(({ username, avatar }: User) => ({ username, avatar }))
+      setSearchResults(users)
+    } 
+    catch (error: unknown) 
+    {
+      setSearchResults([])
       console.log(error)
-    } finally {
-      setIsSearching(false);
+    } 
+    finally 
+    {
+      setIsSearching(false)
     }
-  };
+  }
 
   const handleUserSelect = (selectedUsername: string) => {
-    console.log("Selected user:", selectedUsername);
-    setUsername(selectedUsername);
-    setSearchResults([]);
-    handleSearch(selectedUsername);
-  };
+    setUsername(selectedUsername)
+    setSearchResults([])
+    handleSearch(selectedUsername)
+  }
 
   useEffect(() => {
     return () => {
-      if (searchTimeoutRef.current) {
-        clearTimeout(searchTimeoutRef.current);
-      }
-    };
-  }, []);
+      if (searchTimeoutRef.current)
+        clearTimeout(searchTimeoutRef.current)
+    }
+  }, [])
   
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter')
@@ -111,16 +101,15 @@ const Home = () => {
   
   useEffect(() => {
     const timer = setTimeout(async () => {
-      try {
-        const {data} = await axios.get(`${import.meta.env.VITE_BACK_URL}/history`, {
-          headers: {'api-key': import.meta.env.VITE_API_KEY}
-        })
+      try 
+      {
+        const {data} = await axios.get(`${import.meta.env.VITE_BACK_URL}/history`, {headers: {'api-key': import.meta.env.VITE_API_KEY}})
         setUsers(data)
-        const res = await axios.get(`${import.meta.env.VITE_BACK_URL}/occurences`, {
-          headers: {'api-key': import.meta.env.VITE_API_KEY}
-        })
+        const res = await axios.get(`${import.meta.env.VITE_BACK_URL}/occurences`, {headers: {'api-key': import.meta.env.VITE_API_KEY}})
         setLanguage(res.data)
-      } catch (err: unknown) {
+      } 
+      catch (err: unknown) 
+      {
         console.error(err)
       }
       setWait(true)
@@ -129,33 +118,31 @@ const Home = () => {
   }, [])
 
   const handleSearch = async (selectedUsername?: string) => {
-    const usernameToSearch = selectedUsername || usernameState;
-    console.log("fire");
-    
-
+    const usernameToSearch = selectedUsername || usernameState
     if (notFound)
-      return;
-    if (usernameToSearch.trim() === '') {
+      return
+    if (usernameToSearch.trim() === '') 
+    {
       setIsEmpty(true)
       return 
     }
-    
     setIsEmpty(false)
     setLoading(true)
-    
-    try {
-      const {data} = await axios.get(`${import.meta.env.VITE_BACK_URL}/users`, {
-        params: { username: usernameToSearch },
-        headers: {'api-key': import.meta.env.VITE_API_KEY}
-      })
+    try 
+    {
+      const {data} = await axios.get(`${import.meta.env.VITE_BACK_URL}/users`, {params: {username: usernameToSearch}, headers: {'api-key': import.meta.env.VITE_API_KEY}})
       setNotFound(false)
       navigate(`/user/${data.login}`)
-    } catch (err: unknown) {
+    } 
+    catch (err: unknown) 
+    {
       if (axios.isAxiosError(err) && err.status === 404)
         setNotFound(true)
       else
         console.error(err)
-    } finally {
+    } 
+    finally 
+    {
       setLoading(false)
     }
   }
@@ -187,56 +174,49 @@ const Home = () => {
               onKeyDown={handleKeyDown}
               tabIndex={0}
               placeholder="Enter your Github username"
-              className={`flex-1 px-5 py-3 text-white text-sm md:text-lg placeholder:text-gray-400 outline-none bg-transparent border-t-2 border-l-2 border-b-2 ${isEmpty || notFound ? 'border-red-500' : 'border-white/30'} ${searchResults.length > 0 ? 'rounded-tl-xl' : 'rounded-l-xl'}`}
-            />
-            
+              className={`flex-1 px-5 py-3 text-white text-sm md:text-lg placeholder:text-gray-400 outline-none bg-transparent border-t-2 border-l-2 border-b-2 ${isEmpty || notFound ? 'border-red-500' : 'border-white/30'} ${searchResults.length > 0 ? 'rounded-tl-xl' : 'rounded-l-xl'}`}/>
             <button 
               className={`px-5 py-3 bg-white/30 border-2 hover:bg-white/35 transition-colors duration-300 text-white flex items-center justify-center cursor-pointer ${isEmpty || notFound ? 'border-red-500' : 'border-white/30'} ${searchResults.length > 0 ? 'rounded-tr-xl' : 'rounded-r-xl'}`}
               onClick={() => handleSearch(usernameState)}
               ref={buttonRef}
-              disabled={loading || isSearching}
-            >
+              disabled={loading || isSearching}>
               {loading || isSearching ? (
                 <Loader2 className="animate-spin h-4 w-4 md:h-5 md:w-5 text-white" />
               ) : (
                 <i className="bx bx-search text-white text-sm md:text-xl"></i>
               )}
             </button>
-
             {searchResults.length > 0 && (
               <motion.div 
                 className="absolute left-0 top-full w-full backdrop-blur-sm z-20 border-2 border-white/30 border-t-0 rounded-b-xl shadow-2xl">
                 <ul className="bg-black/80 rounded-b-xl">
                   {searchResults.map((user, index) => {
-                    return (
+                    return ((
                     <motion.li
                       key={user.username + "-" + index}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.2, delay: index * 0.1 }}
-                      className="border-b border-white/10 last:border-b-0"
-                    >
+                      initial={{opacity: 0, y: 10}}
+                      animate={{opacity: 1, y: 0}}
+                      transition={{duration: 0.2, delay: index * 0.1}}
+                      className="border-b border-white/10 last:border-b-0">
                       <button
                         type="button"
                         onClick={() => handleUserSelect(user.username)}
-                        className="cursor-pointer flex items-center gap-3 w-full px-4 py-3 hover:bg-white/10 transition-colors duration-200 text-left"
-                      >
+                        className="cursor-pointer flex items-center gap-3 w-full px-4 py-3 hover:bg-white/10 transition-colors duration-200 text-left">
                         <img
                           src={user.avatar}
                           alt={user.username}
                           className="w-8 h-8 rounded-full object-cover"
                           onError={(e) => {
-                            e.currentTarget.src = '/default-avatar.png';
-                            e.currentTarget.onerror = null;
-                          }}
-                        />
+                            e.currentTarget.src = '/default-avatar.png'
+                            e.currentTarget.onerror = null
+                          }}/>
                         <div className="flex-1">
                           <div className="text-white font-medium">{user.username}</div>
                           <div className="text-gray-400 text-sm">@{user.username}</div>
                         </div>
                       </button>
                     </motion.li>
-                  )})}
+                  ))})}
                 </ul>
               </motion.div>
             )}

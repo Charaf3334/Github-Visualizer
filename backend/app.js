@@ -261,41 +261,23 @@ app.get('/users/:username/:type', async (req, res) => {
 })
 
 app.get('/search/users', async (req, res) => {
-  const { q: query } = req.query;
-  
-  if (!query || query.trim() === '') {
-    return res.status(400).json({ error: 'Search query is required' });
-  }
-
-  try {
-    await checkRate();
-    
-    const { data } = await axios.get(
-      `https://api.github.com/search/users?q=${encodeURIComponent(query)}+in:login&per_page=8`,
-      { headers: getHeaders() }
-    );
-
+  const {q: query} = req.query
+  if (!query || query.trim() === '')
+    return res.status(400).json({error: 'Search query is required'})
+  try 
+  {
+    await checkRate()  
+    const {data} = await axios.get(`https://api.github.com/search/users?q=${encodeURIComponent(query)}+in:login&per_page=8`, {headers: getHeaders()})
     const users = data.items.map(user => ({
       username: user.login,
       avatar: user.avatar_url
-    }));
-
-    res.status(200).json(users);
-  } catch (err) {
-    console.error('GitHub search error:', err.message);
-    
-    if (err.response?.status === 403) {
-      res.status(429).json({ error: 'Rate limit exceeded. Please try again later.' });
-    } else if (err.response?.status === 422) {
-      res.status(400).json({ error: 'Invalid search query' });
-    } else {
-      res.status(err.response?.status || 500).json({ 
-        error: 'Failed to search users' 
-      });
-    }
+    }))
+    res.status(200).json(users)
+  } 
+  catch (err)
+  {
+    res.status(err.response?.status || 500).json({error: 'Failed to fetch repositories'})
   }
-});
-
-
+})
 
 app.listen(port, () => console.log(`Server running on port: ${port}`))
