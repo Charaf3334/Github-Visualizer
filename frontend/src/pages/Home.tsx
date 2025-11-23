@@ -223,8 +223,8 @@ const Home = () => {
                             e.currentTarget.onerror = null
                           }}/>
                         <div className="flex-1">
-                          <div className="text-white text-sm md:text-lg">{user.username}</div>
-                          <div className="text-gray-400 text-xs md:text-sm">@{user.username}</div>
+                          <div className="text-white text-sm md:text-lg">{user.username.length > 30 ? user.username.slice(0, 20) + '...' : user.username}</div>
+                          <div className="text-gray-400 text-xs md:text-sm">@{user.username.length > 30 ? user.username.slice(0, 20) + '...' : user.username}</div>
                         </div>
                       </button>
                     </motion.li>
@@ -272,7 +272,7 @@ const Home = () => {
                           <span className="text-white/90 text-left">
                             {u.username.length > 22 ? u.username.slice(0, 15) + '...' : u.username}
                           </span>
-                          <span className="text-gray-400 text-xs text-left lora-italic">@{u.username}</span>
+                          <span className="text-gray-400 text-xs text-left lora-italic">@{u.username.length > 22 ? u.username.slice(0, 15) + '...' : u.username}</span>
                         </div>
                       </div>
                       <span className="text-gray-400 text-sm">#{i + 1}</span>

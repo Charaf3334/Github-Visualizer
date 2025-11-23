@@ -98,9 +98,7 @@ const UserData = () => {
         if (u.languages) 
         {
           const total = Object.values(u.languages).reduce((a, b) => a + b, 0)
-          const langs: LangData[] = Object.entries(u.languages)
-            .map(([name, val]) => ({name, value: val, percentage: (val / total) * 100}))
-            .sort((a, b) => b.value - a.value)
+          const langs: LangData[] = Object.entries(u.languages).map(([name, val]) => ({name, value: val, percentage: (val / total) * 100})).sort((a, b) => b.value - a.value)
           setLanguages(langs)
         }
         const {data: repos} = await axios.get<Repo[]>(`${import.meta.env.VITE_BACK_URL}/users/${login}/repos`, {headers: {'api-key': import.meta.env.VITE_API_KEY}})
@@ -181,7 +179,7 @@ const UserData = () => {
               </a>
             </div>
             <div className="md:inline-flex inline-block items-center gap-x-3">
-              <h1 className="text-2xl md:text-3xl font-bold mb-2">{user.login}</h1>
+              <h1 className="text-2xl md:text-3xl font-bold mb-2">{user.login.length > 20 ? user.login.slice(0, 15) + '...' : user.login}</h1>
               <span className="inline-flex items-center gap-x-1 px-3 py-1 bg-transparent text-green-700 rounded-full text-sm font-medium border mb-3">
                 <span className="w-2 h-2 bg-green-700 rounded-full"></span>
                 Est. {user.active_since}
