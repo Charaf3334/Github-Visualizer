@@ -1,6 +1,9 @@
 # Browse
 <a href="https://gitvisualizeer.netlify.app/" target="_blank">Visit the website</a>
 
+# Note
+The website may take a bit longer to load at first because the backend is on a free tier. Please be patient, it should take no more than 60 seconds.
+
 # Git Visualizer
 
 As a developer, mastering Github is essential. Git Visualizer lets you explore your Github profile visually, displaying your most-used programming languages and most popular repositories. You can also view your followers and following profiles to explore their stats in the same way.
