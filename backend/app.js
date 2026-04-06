@@ -25,6 +25,10 @@ const pool = new Pool({
 
 pool.connect().then(() => console.log('PostgreSQL connected')).catch(err => console.error('Database connection error:', err.message))
 
+app.get('/health', (req, res) => {
+   return res.status(200).json({message: 'Server is running well.'}) 
+})
+
 app.use((req, res, next) => {
   const key = req.headers['api-key']
   if (key !== process.env.API_KEY)
