@@ -126,10 +126,13 @@ const databaseOperations = async (username, user) => {
       await client.query(`DELETE FROM users WHERE id IN (SELECT id FROM users ORDER BY created_at ASC LIMIT 10)`)
       console.log('Deleted oldest users')
     }
-    await client.query('DELETE FROM users WHERE username = $1', [username])
-    await client.query('INSERT INTO users (username, avatar) VALUES ($1, $2)', [user.login, user.avatar_url])
+    await client.query(`
+      INSERT INTO users (username, avatar, created_at)
+      VALUES ($1, $2, NOW())
+      ON CONFLICT (username)
+      DO UPDATE SET avatar = $2, created_at = NOW()`, [user.login, user.avatar_url])
   } 
-  catch (err) 
+  catch (err)
   {
     console.error('Database error users:', err.message)
     throw err
